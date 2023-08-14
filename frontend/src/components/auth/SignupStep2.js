@@ -26,6 +26,7 @@ import {
 
 import useQuery from "../../hooks/useQuery";
 import { makeCapitalizeText } from "../../utils/makeCapitalizeText";
+import { BACKEND_URL } from "../../bkd";
 
 const useStyles = makeStyles((theme) => ({
   signupInputs: {
@@ -160,7 +161,7 @@ function SignupStep2() {
   const completeSignup = async () => {
     setLoading(true);
     try {
-      const res = await axios.post("/accounts/signup", {
+      const res = await axios.post(`${BACKEND_URL}/accounts/signup`, {
         fname: makeCapitalizeText(values.fName),
         lname: makeCapitalizeText(values.lName),
         password: values.password,

@@ -12,6 +12,7 @@ import authentication from "../../adapters/authentication";
 import useQuery from "../../hooks/useQuery";
 
 import { modalClose, setIsAuthenticate, setUserInfo } from "../../actions/userActions";
+import { BACKEND_URL } from "../../bkd";
 
 const useStyles = makeStyles((theme) => ({
   buttonProgress: {
@@ -76,7 +77,7 @@ function OTPVerify({
   const loginWithMobileNumber = async () => {
     setLoading(true);
     try {
-      const res = await axios.post("/accounts/login-with-phone", {
+      const res = await axios.post(`${BACKEND_URL}/accounts/login-with-phone`, {
         phone: phoneNumber,
       });
 

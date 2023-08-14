@@ -252,7 +252,7 @@ function Login() {
     if (!validatedPhone.isError) {
       setRequestBtnLoading(true);
       try {
-        const res = await axios.post(`${process.env.BACKEND_URL}/accounts/check-phone`, {
+        const res = await axios.post(`${BACKEND_URL}/accounts/check-phone`, {
           phone: values.phone,
         });
         const isRegistered = res.data.isExist;

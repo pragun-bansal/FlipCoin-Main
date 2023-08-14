@@ -27,6 +27,7 @@ import TotalView from "../components/cart/TotalView";
 import AddressCard from "../components/address/AddressCard";
 import LoaderSpinner from "../components/LoaderSpinner";
 import ToastMessageContainer from "../components/ToastMessageContainer";
+import { BACKEND_URL } from "../bkd";
 
 const useStyle = makeStyles((theme) => ({
   component: {
@@ -219,7 +220,7 @@ const CheckoutPage = () => {
   const confirmOrder = async () => {
     if (paymentMode == "cash") {
       try {
-        await axios.post("/orders/complete-order", {
+        await axios.post(`${BACKEND_URL}/orders/complete-order`, {
           items: orderItems,
           userId: user._id,
           addressId: selectedAddr._id,
@@ -235,7 +236,7 @@ const CheckoutPage = () => {
       }
     } else if (paymentMode == "online") {
       try {
-        const res = await axios.post("/orders/complete-order", {
+        const res = await axios.post(`${BACKEND_URL}/orders/complete-order`, {
           items: orderItems,
           userId: user._id,
           addressId: selectedAddr._id,
@@ -244,7 +245,7 @@ const CheckoutPage = () => {
           paymentStatus: "Initiated",
         });
 
-        const { data } = await axios.post("/payment/paytm", {
+        const { data } = await axios.post(`${BACKEND_URL}/payment/paytm`, {
           fName: user.fname,
           lName: user.lname,
           phone: user.phone,

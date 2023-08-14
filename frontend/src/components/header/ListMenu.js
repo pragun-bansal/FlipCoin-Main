@@ -20,6 +20,7 @@ import { setIsAuthenticate, setUserInfo } from "../../actions/userActions";
 import { clearCart } from "../../actions/cartActions";
 import axios from "../../adapters/axios";
 import toastMessage from "../../utils/toastMessage";
+import { BACKEND_URL } from "../../bkd";
 
 const useStyle = makeStyles((theme) => ({
   list: {
@@ -55,7 +56,7 @@ const ListMenu = ({ handleClose }) => {
 
   const logout = async () => {
     try {
-      await axios.get("/accounts/logout", {
+      await axios.get(`${BACKEND_URL}/accounts/logout`, {
         withCredentials: true,
       });
       dispatch(setUserInfo({}));

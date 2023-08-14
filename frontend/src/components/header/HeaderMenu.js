@@ -27,6 +27,7 @@ import toastMessage from "../../utils/toastMessage";
 import AuthPage from "../../pages/AuthPage";
 import ProfileMenu from "./ProfileMenu";
 import { clearCart } from "../../actions/cartActions";
+import { BACKEND_URL } from "../../bkd";
 
 const useStyles = makeStyles((theme) => ({
   headerMenu: {
@@ -95,7 +96,7 @@ function HeaderMenu() {
 
   const logout = async () => {
     try {
-      await axios.get("/accounts/logout", {
+      await axios.get(`${BACKEND_URL}/accounts/logout`, {
         withCredentials: true,
       });
       dispatch(setUserInfo({}));

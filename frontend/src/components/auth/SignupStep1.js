@@ -12,6 +12,7 @@ import sendOTP from "../../utils/sendOTP";
 import { setMobileNumber, setOTPResult } from "../../actions/userActions";
 import { setIsLogin } from "../../actions/userActions";
 import toastMessage from "../../utils/toastMessage";
+import { BACKEND_URL } from "../../bkd";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -66,7 +67,7 @@ function SignupStep1({ handleActions }) {
   const submitPhone = async () => {
     setLoading(true);
     try {
-      const res = await axios.post("/accounts/check-phone", {
+      const res = await axios.post(`${BACKEND_URL}/accounts/check-phone`, {
         phone: phoneNum.value,
       });
       const isRegistered = res.data.isExist;
