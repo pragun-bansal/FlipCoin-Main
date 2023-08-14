@@ -132,6 +132,12 @@ function HeaderMenu() {
         </Button>
       )}
 
+      <Link to="/rewards">
+        <Box className={classes.menu_link}>
+          <Typography className={classes.menu_more}>Reward Program</Typography>
+        </Box>
+      </Link>
+
       <Link to="/more">
         <Box className={classes.menu_link}>
           <Typography className={classes.menu_more}>More</Typography>

@@ -17,6 +17,7 @@ const useStyle = makeStyles({
 
 const GroupedButton = ({ product }) => {
   const classes = useStyle();
+  console.log(product);
   const [counter, setCounter] = useState(product.qty);
 
   const dispatch = useDispatch();

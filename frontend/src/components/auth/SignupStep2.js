@@ -168,9 +168,9 @@ function SignupStep2() {
         phone: phoneNumber,
       });
       const { isAuth, user } = await authentication();
+      console.log(user);
       dispatch(setIsAuthenticate(isAuth));
       dispatch(setUserInfo(user));
-
       setLoading(false);
 
       //Modal Close

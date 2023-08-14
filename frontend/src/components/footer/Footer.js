@@ -30,7 +30,7 @@ function Footer() {
           target="_blank"
           href="https://github.com/dhavalCode"
         >
-          Dhaval Patel
+          Team Binary Blitz
         </a>
         <span style={{fontSize:14}}>&#128153;</span>
       </Typography>

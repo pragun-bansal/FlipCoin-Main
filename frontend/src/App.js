@@ -15,6 +15,7 @@ import CheckoutPage from "./pages/CheckoutPage";
 import OrderFailedPage from "./pages/OrderFailedPage";
 import OrderSuccessPage from "./pages/OrderSuccessPage";
 import monitorImg from './assets/monitors-laptop.png';
+import Rewards from "./pages/RewardPage";
 
 //css
 import "./App.css";
@@ -50,6 +51,9 @@ function App() {
             </Route>
             <Route exact path="/checkout">
               <CheckoutPage />
+            </Route>
+            <Route exact path="/rewards">
+              <Rewards />
             </Route>
             <Route exact path="/product/:id">
               <ProductPage />

@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 
 const signup = async (req, res) => {
   const user = new User(req.body);
+  console.log(user);
   try {
     const token = await user.generateAuthToken();
     await user.save();
@@ -37,6 +38,7 @@ const isExistPhone = async (req, res) => {
 
 const authentication = async (req, res) => {
   try {
+    console.log(req.cookies.auth_token);
     const token = req.cookies.auth_token;
     if (token) {
       const verifyToken = jwt.verify(token, process.env.SECRET_KEY);
