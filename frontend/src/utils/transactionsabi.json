@@ -61,6 +61,11 @@
 				"internalType": "bytes",
 				"name": "signature",
 				"type": "bytes"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "messagehash",
+				"type": "bytes32"
 			}
 		],
 		"name": "claimReward",
@@ -87,7 +92,40 @@
 		"type": "function"
 	},
 	{
-		"inputs": [],
+		"inputs": [
+			{
+				"components": [
+					{
+						"internalType": "address",
+						"name": "user",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "rewardAmount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "nonce",
+						"type": "uint256"
+					},
+					{
+						"internalType": "bytes",
+						"name": "signature",
+						"type": "bytes"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "messagehash",
+						"type": "bytes32"
+					}
+				],
+				"internalType": "struct RewardSystem.RewardClaims[]",
+				"name": "rewardClaims",
+				"type": "tuple[]"
+			}
+		],
 		"name": "handleBatch",
 		"outputs": [],
 		"stateMutability": "nonpayable",
@@ -211,6 +249,35 @@
 			}
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes",
+				"name": "sig",
+				"type": "bytes"
+			}
+		],
+		"name": "splitSignature",
+		"outputs": [
+			{
+				"internalType": "bytes32",
+				"name": "r",
+				"type": "bytes32"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "s",
+				"type": "bytes32"
+			},
+			{
+				"internalType": "uint8",
+				"name": "v",
+				"type": "uint8"
+			}
+		],
+		"stateMutability": "pure",
 		"type": "function"
 	},
 	{

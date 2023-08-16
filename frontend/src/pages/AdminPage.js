@@ -54,13 +54,15 @@ const AdminPage = () => {
   const [popupOpen, setPopupOpen] = useState(false);
 
 
-  const rewardClaims = [
-    {
-      userAddress: "0x1Ba1803B940Fa64C1cDc5EBa942b62C4bB8Cc2D4",
-      rewardAmount: 10000,
-      nonce: 630293,
-      signature: "0x27adc97d07edfa406306619ce3fe7d3e7b771be7df6fb3d94b3af8bd4f2b8a7e4e77910ef13537fd86197832b6c2db68db22f16146d9f80d5c9e854d3b80a4be1b"
-    },
+  const rewardClaims =
+   [
+    [
+      "0x1Ba1803B940Fa64C1cDc5EBa942b62C4bB8Cc2D4",
+      42,
+      923943,
+       "0x29ccc84ff2e07d104db5bbef2be1daf12b2a71842d5d52145f989c55a1568ad471b36f007e818dcf897bbcd34c679c4057a10686c6f39e32fdab2c76ecaf44b81b",
+       "0x19a0f76fa83956ec42c78759d28f52253d2067cf8298a8fc2a2c165038e9d82d"
+    ]
   ];
 
   async function submitRewardBatch() {
@@ -70,7 +72,7 @@ const AdminPage = () => {
         const privateKey = "749fd5aaae691acca5d7ad99db3ef39065a2fa3c4ea51c22af2c48536746c111"; // Admin's private key
         const sender = new ethers.Wallet(privateKey, provider);
         // await sender.sendTransaction({to: '0xa421D70fc0a3eda6fbaE1C0C94c93E54ac1Dcd15', value: ethers.utils.parseEther("0.001")});
-        const contractAddress = "0x3155Bac72b630DD7E2b179fE53fBF7ecd4D21029";
+        const contractAddress = "0xE67df2B8ABFa7FE11BDd22DC950C46d988458031";
         const contract = new ethers.Contract(contractAddress,Transactionabi, sender);
         console.log("contract", contract);
         const balance = await contract.showBalance();
@@ -78,10 +80,11 @@ const AdminPage = () => {
 
 
         console.log("contract", contract);
-        const batch = [];
+        await contract.handleBatch(rewardClaims);
+        // const batch = [];
 
-        for (let rwd of rewardClaims) {
-          const { userAddress, rewardAmount, nonce, signature } = rwd;
+        // for (let rwd of rewardClaims) {
+          // const { userAddress, rewardAmount, nonce, signature } = rwd;
           // let sign 
           // // try {
           //     // sign = ethers.utils.arrayify(ethers.utils.hexlify(ethers.utils.toUtf8Bytes(signature)));
@@ -103,17 +106,18 @@ const AdminPage = () => {
           
 
           // console.log("transaction", transaction);
-        
-          const tx = await contract.claimReward(
-            userAddress,
-            rewardAmount,
-            nonce,
-            signature
-          );
-          const tx1 = await contract.fund();
-          console.log("tx", tx);
-          console.log(tx1);
-          batch.push(tx);
+       
+
+          // const tx = await contract.claimReward(
+          //   userAddress,
+          //   rewardAmount,
+          //   nonce,
+          //   signature
+          // );
+          // const tx1 = await contract.fund();
+          // console.log("tx", tx);
+          // // console.log(tx1);
+          // batch.push(tx);
         }
 
         
@@ -123,7 +127,7 @@ const AdminPage = () => {
         // });
 
         // await txResponse.wait();
-    } catch (error) {
+    catch (error) {
       console.error("Error submitting reward batch:", error);
     }
   }

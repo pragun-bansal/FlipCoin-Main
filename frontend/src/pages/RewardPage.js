@@ -153,6 +153,7 @@ const Rewards = () => {
         rewardAmount: rewardAmount,
         nonce: nonce,
         signature: signature,
+        messageHash: messageHash
       };
 
       verifyRewardClaim(rewardClaim);
