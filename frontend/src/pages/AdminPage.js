@@ -56,10 +56,10 @@ const AdminPage = () => {
 
   const rewardClaims = [
     {
-      userAddress: "0x2670d84e0C868c61aBD6d3dCd3f8F0dA61B7DfB4",
-      rewardAmount: 10,
-      nonce: 902842,
-      signature: "0x2b354bc304b7e427314f6295b2d018ff46bdb4b2791863e4c75477f8a0978648056a07a8c78997809ab6bf68de50177573011204ed3270b6e91680104f5c7db91b"
+      userAddress: "0x1Ba1803B940Fa64C1cDc5EBa942b62C4bB8Cc2D4",
+      rewardAmount: 10000,
+      nonce: 630293,
+      signature: "0x27adc97d07edfa406306619ce3fe7d3e7b771be7df6fb3d94b3af8bd4f2b8a7e4e77910ef13537fd86197832b6c2db68db22f16146d9f80d5c9e854d3b80a4be1b"
     },
   ];
 
@@ -70,43 +70,59 @@ const AdminPage = () => {
         const privateKey = "749fd5aaae691acca5d7ad99db3ef39065a2fa3c4ea51c22af2c48536746c111"; // Admin's private key
         const sender = new ethers.Wallet(privateKey, provider);
         // await sender.sendTransaction({to: '0xa421D70fc0a3eda6fbaE1C0C94c93E54ac1Dcd15', value: ethers.utils.parseEther("0.001")});
-        const contractAddress = "0x04567D75c2bDB4A89cc71840d5194Be2aF0365A9";
+        const contractAddress = "0x3155Bac72b630DD7E2b179fE53fBF7ecd4D21029";
         const contract = new ethers.Contract(contractAddress,Transactionabi, sender);
+        console.log("contract", contract);
+        const balance = await contract.showBalance();
+        console.log("balance", ethers.utils.formatEther(balance));
+
+
         console.log("contract", contract);
         const batch = [];
 
         for (let rwd of rewardClaims) {
           const { userAddress, rewardAmount, nonce, signature } = rwd;
-          let sign 
-          try {
-              sign = ethers.utils.arrayify(ethers.utils.hexlify(ethers.utils.toUtf8Bytes(signature)));
-          } catch (error) {
-              console.error("Error parsing signature:", error);
-          }
+          // let sign 
+          // // try {
+          //     // sign = ethers.utils.arrayify(ethers.utils.hexlify(ethers.utils.toUtf8Bytes(signature)));
+          // } catch (error) {
+          //     console.error("Error parsing signature:", error);
+          // }
           
-          console.log("sign", sign);
-          const tx = await contract.populateTransaction.claimReward(
+          // console.log("sign", sign.join(' '));
+
+        
+          // const accounts = await provider.listAccounts();
+          // const signer = provider.getSigner(accounts[0]);
+          // // const trn = {
+          //   to: "0x2707bd1ba885f9B4D141d214Ea18a72728fb3158",
+          //   value: ethers.utils.parseEther('0.001', 'ether')
+          // };
+          // const transaction = await signer.sendTransaction(trn);
+
+          
+
+          // console.log("transaction", transaction);
+        
+          const tx = await contract.claimReward(
             userAddress,
             rewardAmount,
             nonce,
-            sign
+            signature
           );
-          console.log(tx);
+          const tx1 = await contract.fund();
+          console.log("tx", tx);
+          console.log(tx1);
           batch.push(tx);
         }
 
- 
-        const txResponse = await sender.sendTransaction({
-          to: "0x99af18A4c649F44d839741711AFB5998A335feCd",
-          data: ethers.utils.defaultAbiCoder.encode(
-            ["tuple(address,uint256)[],uint256"],
-            [rewardClaims.map(({ userAddress, rewardAmount }) => [userAddress,rewardAmount,]),0,]
-          ),
-          gasLimit: ethers.utils.hexlify(5000000),
-          value: ethers.utils.parseEther("0"), 
-        });
+        
+        // const txResponse = await sender.sendTransaction({
+        //   to: "0x99af18A4c649F44d839741711AFB5998A335feCd",
+        //   value: ethers.utils.parseEther("0"), 
+        // });
 
-        await txResponse.wait();
+        // await txResponse.wait();
     } catch (error) {
       console.error("Error submitting reward batch:", error);
     }

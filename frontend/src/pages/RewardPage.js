@@ -99,11 +99,16 @@ const Rewards = () => {
     try {
       const { userAddress, rewardAmount, nonce, signature } = rewardClaim;
       console.log("Verifying reward claim:", rewardClaim);
-    //   const provider = new ethers.providers.Web3Provider(window.ethereum);
+
+      // const provider = new ethers.providers.Web3Provider(window.ethereum);
+      // const accounts = await provider.listAccounts();
+      // const signer = provider.getSigner(accounts[1]);
+
       const message = ethers.utils.defaultAbiCoder.encode(
         ["address", "uint256", "uint256"],
         [userAddress, rewardAmount, nonce]
       );
+      
       const messageHash = ethers.utils.keccak256(message);
 
       const recoveredAddress = await ethers.utils.verifyMessage(
@@ -128,9 +133,11 @@ const Rewards = () => {
     try {
       await window.ethereum.request({ method: "eth_requestAccounts" });
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
+      const accounts = await provider.listAccounts();
+      const signer = provider.getSigner(accounts[1]);
+      // const signer = provider.getSigner();
       const userAddress = await signer.getAddress();
-      const rewardAmount = 10; // Replace with the actual reward amount
+      const rewardAmount = 1; // Replace with the actual reward amount
       const nonce = Math.floor(Math.random() * 1000000); // Generate a nonce
       const message = ethers.utils.defaultAbiCoder.encode(
         ["address", "uint256", "uint256"],

@@ -26,7 +26,7 @@
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "user",
+				"name": "cntr",
 				"type": "address"
 			},
 			{
@@ -35,9 +35,9 @@
 				"type": "uint256"
 			}
 		],
-		"name": "addToBalance",
+		"name": "allow",
 		"outputs": [],
-		"stateMutability": "nonpayable",
+		"stateMutability": "payable",
 		"type": "function"
 	},
 	{
@@ -69,8 +69,39 @@
 		"type": "function"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "val",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "reciver",
+				"type": "address"
+			}
+		],
+		"name": "fund",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
 		"inputs": [],
 		"name": "handleBatch",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "flcTokenAddress",
+				"type": "address"
+			}
+		],
+		"name": "setFlcToken",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -145,12 +176,38 @@
 	},
 	{
 		"inputs": [],
+		"name": "flcToken",
+		"outputs": [
+			{
+				"internalType": "contract IERC20",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "owner",
 		"outputs": [
 			{
 				"internalType": "address",
 				"name": "",
 				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "showBalance",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
