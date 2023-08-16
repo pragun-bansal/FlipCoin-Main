@@ -8,16 +8,54 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Container,
+  Card,
+  CardHeader,
+  CardContent,
 } from "@material-ui/core";
 import ToastMessageContainer from "../components/ToastMessageContainer";
 import { ethers } from "ethers";
-import Transactionabi from '../utils/transactionsabi.json'
+import Flcabi from '../utils/flcabi.json'
+
+/*
+
+user model = {
+  used achivemnts = {
+    "achivem1","achivem2","achivem3"
+  }
+}
+*/
+const achivements = [
+  {
+    "title": "Achievment 1",
+    "description": "First time user",
+    "reward": 100,
+    "minthreshold": 30,
+    "imageuri":"",
+  },
+  {
+    "description": "First time user",
+    "reward": 500,
+    "minthreshold": 30
+  },
+  {
+    "description": "First time user",
+    "reward": 10,
+    "minthreshold": 30
+  },
+  {
+    "description": "First time user",
+    "reward": 30,
+    "minthreshold": 30
+  },
+]
 
 const useStyle = makeStyles((theme) => ({
   component: {
     marginTop: 55,
     padding: "30px 6%",
     display: "flex",
+    spacing: 4,
   },
   leftComponent: {
     paddingRight: 15,
@@ -54,41 +92,16 @@ const Rewards = () => {
   const [popupOpen, setPopupOpen] = useState(false);
 
   const connectWallet = async () => {
-    if (typeof window.ethereum !== "undefined") {
-      try {
-        await window.ethereum.request({ method: "eth_requestAccounts" });
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner();
-        const address = await signer.getAddress();
-        const balance = await provider.getBalance(address);
-        const etherBalance = ethers.utils.formatEther(balance);
-        setCryptoBalance(etherBalance);
-        console.log("Balance: ", etherBalance);
-
-        try {
-          const history = await provider.getHistory(address);
-          console.log("History:", history);
-          const formattedTransactions = await Promise.all(
-            history.map(async (tx) => {
-              const txReceipt = await provider.getTransactionReceipt(tx.hash);
-              return {
-                hash: tx.hash,
-                to: tx.to,
-                value: ethers.utils.formatEther(tx.value),
-                confirmed: txReceipt ? txReceipt.confirmations > 0 : false,
-              };
-            })
-          );
-          setTransactions(formattedTransactions);
-        } catch (error) {
-          console.error("Error fetching transactions:", error);
-        }
-      } catch (error) {
-        console.error("Error connecting wallet:", error);
-      }
-    } else {
-      console.error("No Ethereum wallet found.");
-    }
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const privateKey = "8d1444ef95f13c8d0713e4319463d8d24316940a21a9624b81978d84c6c616f3"; // Admin's private key
+    const sender = new ethers.Wallet(privateKey, provider);
+    const signer = provider.getSigner();
+    const contract = new ethers.Contract("0xc1c62B3f6Ba557233f4Fe93C0e824Ae04234666F",Flcabi, sender);
+    const walletaddress = await signer.getAddress();
+    console.log("sender's address is: " , walletaddress)
+    const balance = await contract.balanceOf(walletaddress);
+    console.log("balance: ",balance)
+    setCryptoBalance(ethers.utils.formatEther(balance));
   };
 
   useEffect(() => {
@@ -129,7 +142,7 @@ const Rewards = () => {
     }
   };
 
-  const claimrewardfunc = async () => {
+  const claimrewardfunc = async (rewardAmount) => {
     try {
       await window.ethereum.request({ method: "eth_requestAccounts" });
       const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -137,7 +150,7 @@ const Rewards = () => {
       const signer = provider.getSigner(accounts[1]);
       // const signer = provider.getSigner();
       const userAddress = await signer.getAddress();
-      const rewardAmount = 1; // Replace with the actual reward amount
+      // const rewardAmount = 1; // Replace with the actual reward amount
       const nonce = Math.floor(Math.random() * 1000000); // Generate a nonce
       const message = ethers.utils.defaultAbiCoder.encode(
         ["address", "uint256", "uint256"],
@@ -163,7 +176,17 @@ const Rewards = () => {
   };
 
   return (
-    <>
+    <Container maxWidth={"lg"}>
+      <Grid container className={classes.component}>
+      {achivements.map((achivement,index) => (
+        <Card onClick={()=>claimrewardfunc(achivement.reward)} key={index}>
+          <CardContent>
+           {achivement.description}
+           {achivement.reward}
+          </CardContent>
+        </Card>
+      ))}        
+      </Grid>
       <Grid container className={classes.component}>
         <Box className={classes.header}>
           Your Flipcoins balance is {cryptoBalance} FLC
@@ -187,7 +210,7 @@ const Rewards = () => {
         </DialogActions>
       </Dialog>
       <ToastMessageContainer />
-    </>
+    </Container>
   );
 };
 

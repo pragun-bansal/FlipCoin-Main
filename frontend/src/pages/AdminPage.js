@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {  useState } from "react";
 import {
   makeStyles,
   Grid,
@@ -49,8 +49,6 @@ const useStyle = makeStyles((theme) => ({
 
 const AdminPage = () => {
   const classes = useStyle();
-  const [cryptoBalance, setCryptoBalance] = useState(0);
-  const [transactions, setTransactions] = useState([]);
   const [popupOpen, setPopupOpen] = useState(false);
 
 
@@ -69,10 +67,11 @@ const AdminPage = () => {
     try {
         await window.ethereum.request({ method: "eth_requestAccounts" });
         const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const privateKey = "749fd5aaae691acca5d7ad99db3ef39065a2fa3c4ea51c22af2c48536746c111"; // Admin's private key
+        const privateKey = "8d1444ef95f13c8d0713e4319463d8d24316940a21a9624b81978d84c6c616f3"; // Admin's private key
         const sender = new ethers.Wallet(privateKey, provider);
-        // await sender.sendTransaction({to: '0xa421D70fc0a3eda6fbaE1C0C94c93E54ac1Dcd15', value: ethers.utils.parseEther("0.001")});
-        const contractAddress = "0xE67df2B8ABFa7FE11BDd22DC950C46d988458031";
+        const contractAddress = "0xb97e2EF23af04418fD2De96887F3310C11434506";
+        const signer = provider.getSigner();
+        console.log("semder", sender);
         const contract = new ethers.Contract(contractAddress,Transactionabi, sender);
         console.log("contract", contract);
         const balance = await contract.showBalance();
@@ -137,26 +136,9 @@ const AdminPage = () => {
   return (
     <>
       <Grid container className={classes.component}>
-        <Box className={classes.header}>
-          Your Flipcoins balance is {cryptoBalance} FLC
-        </Box>
+
         <Button onClick={submitRewardBatch}>Batch Request Approve</Button>
       </Grid>
-      <Dialog open={popupOpen} onClose={() => setPopupOpen(false)}>
-        <DialogTitle>Latest Transactions</DialogTitle>
-        <DialogContent>
-          {transactions.map((tx) => (
-            <div key={tx.hash}>
-              <p>{tx.to}</p>
-              <p>Value: {tx.value} ETH</p>
-              <p>Status: {tx.confirmed ? "Confirmed" : "Pending"}</p>
-            </div>
-          ))}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setPopupOpen(false)}>Close</Button>
-        </DialogActions>
-      </Dialog>
       <ToastMessageContainer />
     </>
   );
