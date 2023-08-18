@@ -44,6 +44,9 @@ const {
   paytmGatway,
   paytmDataResponse,
 } = require("../controllers/payment-controller");
+const { getAchievmentById, getAchievments, createAchievment, updateAchievment } = require("../controllers/achievment-controller");
+const { getCoupons, createCoupon, getCouponById, updateCoupon } = require("../controllers/coupon-controller");
+const { getRequests, approveRequest, createRequest } = require("../controllers/admin-controller");
 
 const router = express.Router();
 
@@ -89,5 +92,20 @@ router.post("/orders/get-order-details", getOrderDetails);
 //Payment related routes
 router.post("/payment/paytm", paytmGatway);
 router.post("/payment/paytmresponse", paytmDataResponse);
+
+router.get("/achievements", getAchievments);
+router.post("/achievements/add", createAchievment);
+router.get("/achievements/:id", getAchievmentById);
+router.patch("/achievements/:id", updateAchievment);
+
+
+router.get("/coupons",getCoupons);
+router.post("/coupons/add",createCoupon);
+router.get("/coupons/:id",getCouponById);
+router.patch("/coupons/:id",updateCoupon);
+
+router.get("/requests/:userid",getRequests);
+router.patch("/requests/:userid/:reqid",approveRequest);
+router.post("/requests",createRequest);
 
 module.exports = router;

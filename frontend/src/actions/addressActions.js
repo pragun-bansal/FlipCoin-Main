@@ -31,6 +31,7 @@ export const getAddresses = () => async (dispatch, getState) => {
   }
 };
 
+
 export const deleteAddress = (id) => async (dispatch) => {
     try {
       await axios.delete(`${BACKEND_URL}/address/delete-address`, {

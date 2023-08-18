@@ -22,6 +22,38 @@ const userSchema = mongoose.Schema({
   },
   gender: String,
   email: String,
+  claimedAchivements: [{
+      achivementId: {
+        type: mongoose.Schema.ObjectId,
+        ref: "achievment",
+        required: true,
+      },
+      claimedDate: {
+        type: Date,
+        default: Date.now(),
+      },
+  }],
+  role: {
+    type: String,
+    enum: ["user", "admin"],
+    default: "user",
+  },
+  avaiableCoupons: [{
+      couponId: {
+        type: mongoose.Schema.ObjectId,
+        ref: "coupon",
+        required: true,
+      },
+      lastDate: {
+        type: Date,
+        required: true, // current date + 10 days
+        default: Date.now()+10*24*60*60*1000,
+      },
+      claimed:{
+        type: Boolean,
+        required: true,
+      }
+  }],
   tokens: [
     {
       token: {

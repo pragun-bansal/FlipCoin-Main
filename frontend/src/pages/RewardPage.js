@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useReward } from "react-rewards";
-import { Link } from "react-router-dom";
 import {
   makeStyles,
   Grid,
@@ -11,22 +10,16 @@ import {
   DialogContent,
   DialogActions,
   Container,
-  Card,
-  CardContent,
 } from "@material-ui/core";
 import ToastMessageContainer from "../components/ToastMessageContainer";
 import { ethers } from "ethers";
-import { TbGiftCard } from "react-icons/tb";
 import Flcabi from "../utils/flcabi.json";
+import { AiFillLock } from "react-icons/ai";
+import axios from "../adapters/axios";
+import { BACKEND_URL } from "../bkd";
+import { useSelector } from "react-redux";
 
-// /*
 
-// user model = {
-//   used achivemnts = {
-//     "achivem1","achivem2","achivem3"
-//   }
-// }
-// */
 const achivements = [
   {
     title: "First Order",
@@ -102,6 +95,14 @@ const Rewards = () => {
   const [transactions, setTransactions] = useState([]);
   const [popupOpen, setPopupOpen] = useState(false);
 
+  const {user} = useSelector((state) => state.userReducer);
+  let userid 
+  if(user._id) userid = user._id
+  else userid = "64dfa64139cd4372aa5744c3"
+
+  // user state from redux
+
+
   const connectWallet = async () => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const privateKey =
@@ -128,10 +129,6 @@ const Rewards = () => {
     try {
       const { userAddress, rewardAmount, nonce, signature } = rewardClaim;
       console.log("Verifying reward claim:", rewardClaim);
-
-      // const provider = new ethers.providers.Web3Provider(window.ethereum);
-      // const accounts = await provider.listAccounts();
-      // const signer = provider.getSigner(accounts[1]);
 
       const message = ethers.utils.defaultAbiCoder.encode(
         ["address", "uint256", "uint256"],
@@ -168,15 +165,19 @@ const Rewards = () => {
       const userAddress = await signer.getAddress();
       // const rewardAmount = 1; // Replace with the actual reward amount
       const nonce = Math.floor(Math.random() * 1000000); // Generate a nonce
+     
       const message = ethers.utils.defaultAbiCoder.encode(
         ["address", "uint256", "uint256"],
         [userAddress, rewardAmount, nonce]
       );
+
+      console.log("Reward claim signature:", message);
       const messageHash = ethers.utils.keccak256(message);
       const signature = await signer.signMessage(
         ethers.utils.arrayify(messageHash)
       );
 
+      
       const rewardClaim = {
         userAddress: userAddress,
         rewardAmount: rewardAmount,
@@ -186,30 +187,29 @@ const Rewards = () => {
       };
 
       verifyRewardClaim(rewardClaim);
+      axios.post(`${BACKEND_URL}/requests`,{
+        address: userAddress,
+        amount: rewardAmount,
+        nonce: nonce,
+        signature: signature,
+        messageHash: messageHash,
+        userid: userid
+      })
     } catch (error) {
       console.error("Error claiming reward:", error);
     }
   };
 
   return (
-    <Container maxWidth={"lg"} className="flex justify-center">
+    <Container maxWidth={"lg"} className="mx-auto">
       <Grid container className={classes.component}>
         {achivements.map((ach, idx) => (
           <div
-            className={`w-80 bg-white shadow   relative rounded-md m-4`}
+            className={`w-72 h-[340px] bg-white shadow   relative rounded-md m-4 p-4`}
             key={idx}
           >
-            {!ach.isEligible && !ach.claimed && (
-              <div className="overlay w-full h-full absolute z-20 flex items-center justify-center rounded-md">
-                <img
-                  src="https://img.icons8.com/ios/50/FFFFFF/lock--v1.png"
-                  alt="locked"
-                  className="w-24 h-24"
-                />
-              </div>
-            )}
             {ach.claimed && (
-              <div className="overlay2 w-full h-full absolute z-20 flex items-center justify-center rounded-md">
+              <div className="overlay w-full h-full absolute z-20 flex items-center justify-center rounded-md top-0 left-0">
                 <img
                   src="https://i.postimg.cc/Fsn0tQQ7/claimed.png"
                   alt="locked"
@@ -217,38 +217,32 @@ const Rewards = () => {
                 />
               </div>
             )}
-            <Link to={`/product/${ach._id}`}>
-              <div
-                className="h-48 w-full  flex flex-col justify-between p-4 bg-contain bg-no-repeat bg-center"
-                style={{
-                  backgroundImage: `url(https://i.postimg.cc/GmhsDC5K/reward2.jpg)`,
-                }}
-              >
-                {/* <div>
-                  <span className="uppercase text-xs bg-green-50 p-0.5 border-green-500 border rounded text-green-700 font-medium select-none">
-                    available
-                  </span>
-                </div> */}
-              </div>
-            </Link>
+            <div
+              className="h-48 w-full  flex flex-col justify-between p-4 bg-contain bg-no-repeat bg-center"
+              style={{
+                backgroundImage: `url(https://i.postimg.cc/GmhsDC5K/reward2.jpg)`,
+              }}
+            ></div>
             <div className="p-4 flex flex-col items-center">
-              <Link to={`/product/${ach._id}`}>
-                <h1 className="text-gray-800 text-center text-lg mt-1">
-                  {ach.title}
-                </h1>
-              </Link>
+              <h1 className="text-gray-800 text-center text-lg mt-1">
+                {ach.title}
+              </h1>
               {!ach.claimed && (
                 <button
                   className="py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 active:bg-blue-700 disabled:opacity-50 mt-4 w-full flex items-center justify-center gap-2"
-                  disabled={isAnimating}
+                  disabled={isAnimating || !ach.isEligible}
                   onClick={reward}
                 >
-                  <div id="rewardId" className="w-full h-full ">
-                    Claim Reward
-                    <p className=" ">({ach.reward} FLC)</p>
-                  </div>
-
-                  {/* <TbGiftCard /> */}
+                  {!ach.isEligible ? (
+                    <div className="w-full h-full py-2  flex items-center justify-center">
+                      <AiFillLock size={20} />
+                    </div>
+                  ) : (
+                    <div id="rewardId" className="w-full h-full ">
+                      Claim Reward
+                      <p className=" ">({ach.reward} FLC)</p>
+                    </div>
+                  )}
                 </button>
               )}
             </div>
