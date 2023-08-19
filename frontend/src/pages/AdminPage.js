@@ -89,12 +89,12 @@ const AdminPage = () => {
   const {user} = useSelector((state) => state.userReducer);
   let userid 
   if(user._id) userid = user._id
-  else userid = "64dfa64139cd4372aa5744c3"
+  else userid = "64e06a77c96091c2139abc82"
+  console.log(userid)
 
   useEffect(() => {
     const getRequests = async () => {
-      const { data } = await axios.get(`${BACKEND_URL}/requests/${userid}`);
-      console.log(data);
+      const  {data}  = await axios.get(`${BACKEND_URL}/requests/${userid}`);
       setRequests(data);
     };
     getRequests();
@@ -106,7 +106,7 @@ const AdminPage = () => {
     { field: 'address', headerName: 'User Address', width: 200 },
     { field: 'amount', headerName: 'FLC', width: 80 },
     { field: 'nonce', headerName: 'Nonce',width: 90 },
-    { field: 'messageHash', headerName: 'Message Hash',width: 160,},
+    { field: 'message', headerName: 'Message',width: 160,},
     { field: 'signature', headerName: 'Signature',width: 160,},
   ];
   
@@ -119,148 +119,35 @@ const AdminPage = () => {
     setOpen(false);
   };
     
-  const rewardClaims =
-   [
-    [
-      "0x1Ba1803B940Fa64C1cDc5EBa942b62C4bB8Cc2D4",
-      42,
-      923943,
-       "0x29ccc84ff2e07d104db5bbef2be1daf12b2a71842d5d52145f989c55a1568ad471b36f007e818dcf897bbcd34c679c4057a10686c6f39e32fdab2c76ecaf44b81b",
-       "0x19a0f76fa83956ec42c78759d28f52253d2067cf8298a8fc2a2c165038e9d82d"
-    ],
-    [
-      "0x1Ba1803B940Fa64C1cDc5EBa942b62C4bB8Cc2D4",
-      42,
-      923943,
-       "0x29ccc84ff2e07d104db5bbef2be1daf12b2a71842d5d52145f989c55a1568ad471b36f007e818dcf897bbcd34c679c4057a10686c6f39e32fdab2c76ecaf44b81b",
-       "0x19a0f76fa83956ec42c78759d28f52253d2067cf8298a8fc2a2c165038e9d82d"
-    ],
-    [
-      "0x1Ba1803B940Fa64C1cDc5EBa942b62C4bB8Cc2D4",
-      42,
-      923943,
-       "0x29ccc84ff2e07d104db5bbef2be1daf12b2a71842d5d52145f989c55a1568ad471b36f007e818dcf897bbcd34c679c4057a10686c6f39e32fdab2c76ecaf44b81b",
-       "0x19a0f76fa83956ec42c78759d28f52253d2067cf8298a8fc2a2c165038e9d82d"
-    ],
-    [
-      "0x1Ba1803B940Fa64C1cDc5EBa942b62C4bB8Cc2D4",
-      42,
-      923943,
-       "0x29ccc84ff2e07d104db5bbef2be1daf12b2a71842d5d52145f989c55a1568ad471b36f007e818dcf897bbcd34c679c4057a10686c6f39e32fdab2c76ecaf44b81b",
-       "0x19a0f76fa83956ec42c78759d28f52253d2067cf8298a8fc2a2c165038e9d82d"
-    ],
-    [
-      "0x1Ba1803B940Fa64C1cDc5EBa942b62C4bB8Cc2D4",
-      42,
-      923943,
-       "0x29ccc84ff2e07d104db5bbef2be1daf12b2a71842d5d52145f989c55a1568ad471b36f007e818dcf897bbcd34c679c4057a10686c6f39e32fdab2c76ecaf44b81b",
-       "0x19a0f76fa83956ec42c78759d28f52253d2067cf8298a8fc2a2c165038e9d82d"
-    ],
-    [
-      "0x1Ba1803B940Fa64C1cDc5EBa942b62C4bB8Cc2D4",
-      42,
-      923943,
-       "0x29ccc84ff2e07d104db5bbef2be1daf12b2a71842d5d52145f989c55a1568ad471b36f007e818dcf897bbcd34c679c4057a10686c6f39e32fdab2c76ecaf44b81b",
-       "0x19a0f76fa83956ec42c78759d28f52253d2067cf8298a8fc2a2c165038e9d82d"
-    ],
-    [
-      "0x1Ba1803B940Fa64C1cDc5EBa942b62C4bB8Cc2D4",
-      42,
-      923943,
-       "0x29ccc84ff2e07d104db5bbef2be1daf12b2a71842d5d52145f989c55a1568ad471b36f007e818dcf897bbcd34c679c4057a10686c6f39e32fdab2c76ecaf44b81b",
-       "0x19a0f76fa83956ec42c78759d28f52253d2067cf8298a8fc2a2c165038e9d82d"
-    ],
-    [
-      "0x1Ba1803B940Fa64C1cDc5EBa942b62C4bB8Cc2D4",
-      42,
-      923943,
-       "0x29ccc84ff2e07d104db5bbef2be1daf12b2a71842d5d52145f989c55a1568ad471b36f007e818dcf897bbcd34c679c4057a10686c6f39e32fdab2c76ecaf44b81b",
-       "0x19a0f76fa83956ec42c78759d28f52253d2067cf8298a8fc2a2c165038e9d82d"
-    ],
-    [
-      "0x1Ba1803B940Fa64C1cDc5EBa942b62C4bB8Cc2D4",
-      42,
-      923943,
-       "0x29ccc84ff2e07d104db5bbef2be1daf12b2a71842d5d52145f989c55a1568ad471b36f007e818dcf897bbcd34c679c4057a10686c6f39e32fdab2c76ecaf44b81b",
-       "0x19a0f76fa83956ec42c78759d28f52253d2067cf8298a8fc2a2c165038e9d82d"
-    ],
-    [
-      "0x1Ba1803B940Fa64C1cDc5EBa942b62C4bB8Cc2D4",
-      42,
-      923943,
-       "0x29ccc84ff2e07d104db5bbef2be1daf12b2a71842d5d52145f989c55a1568ad471b36f007e818dcf897bbcd34c679c4057a10686c6f39e32fdab2c76ecaf44b81b",
-       "0x19a0f76fa83956ec42c78759d28f52253d2067cf8298a8fc2a2c165038e9d82d"
-    ],
-    [
-      "0x1Ba1803B940Fa64C1cDc5EBa942b62C4bB8Cc2D4",
-      42,
-      923943,
-       "0x29ccc84ff2e07d104db5bbef2be1daf12b2a71842d5d52145f989c55a1568ad471b36f007e818dcf897bbcd34c679c4057a10686c6f39e32fdab2c76ecaf44b81b",
-       "0x19a0f76fa83956ec42c78759d28f52253d2067cf8298a8fc2a2c165038e9d82d"
-    ],
-    [
-      "0x1Ba1803B940Fa64C1cDc5EBa942b62C4bB8Cc2D4",
-      42,
-      923943,
-       "0x29ccc84ff2e07d104db5bbef2be1daf12b2a71842d5d52145f989c55a1568ad471b36f007e818dcf897bbcd34c679c4057a10686c6f39e32fdab2c76ecaf44b81b",
-       "0x19a0f76fa83956ec42c78759d28f52253d2067cf8298a8fc2a2c165038e9d82d"
-    ],
-    [
-      "0x1Ba1803B940Fa64C1cDc5EBa942b62C4bB8Cc2D4",
-      42,
-      923943,
-       "0x29ccc84ff2e07d104db5bbef2be1daf12b2a71842d5d52145f989c55a1568ad471b36f007e818dcf897bbcd34c679c4057a10686c6f39e32fdab2c76ecaf44b81b",
-       "0x19a0f76fa83956ec42c78759d28f52253d2067cf8298a8fc2a2c165038e9d82d"
-    ],
-    [
-      "0x1Ba1803B940Fa64C1cDc5EBa942b62C4bB8Cc2D4",
-      42,
-      923943,
-       "0x29ccc84ff2e07d104db5bbef2be1daf12b2a71842d5d52145f989c55a1568ad471b36f007e818dcf897bbcd34c679c4057a10686c6f39e32fdab2c76ecaf44b81b",
-       "0x19a0f76fa83956ec42c78759d28f52253d2067cf8298a8fc2a2c165038e9d82d"
-    ],
-    [
-      "0x1Ba1803B940Fa64C1cDc5EBa942b62C4bB8Cc2D4",
-      42,
-      923943,
-       "0x29ccc84ff2e07d104db5bbef2be1daf12b2a71842d5d52145f989c55a1568ad471b36f007e818dcf897bbcd34c679c4057a10686c6f39e32fdab2c76ecaf44b81b",
-       "0x19a0f76fa83956ec42c78759d28f52253d2067cf8298a8fc2a2c165038e9d82d"
-    ],
-    [
-      "0x1Ba1803B940Fa64C1cDc5EBa942b62C4bB8Cc2D4",
-      42,
-      923943,
-       "0x29ccc84ff2e07d104db5bbef2be1daf12b2a71842d5d52145f989c55a1568ad471b36f007e818dcf897bbcd34c679c4057a10686c6f39e32fdab2c76ecaf44b81b",
-       "0x19a0f76fa83956ec42c78759d28f52253d2067cf8298a8fc2a2c165038e9d82d"
-    ],
-    [
-      "0x1Ba1803B940Fa64C1cDc5EBa942b62C4bB8Cc2D4",
-      42,
-      923943,
-       "0x29ccc84ff2e07d104db5bbef2be1daf12b2a71842d5d52145f989c55a1568ad471b36f007e818dcf897bbcd34c679c4057a10686c6f39e32fdab2c76ecaf44b81b",
-       "0x19a0f76fa83956ec42c78759d28f52253d2067cf8298a8fc2a2c165038e9d82d"
-    ]
-  ];
 
-  const rewardClaimsArray = rewardClaims.map((claim,index) => {
-    return {
-      id: index+1,
-      address: claim[0],
-      amount: claim[1],
-      nonce: claim[2],
-      messageHash: claim[3],
-      signature: claim[4],
-    };
+  const rewardClaimsArray = requests.map((req) => {
+    return{
+      id: req._id,
+      address: req.address,
+      amount: req.amount,
+      approved: req.approved,
+      message: req.message,
+      nonce: req.nonce,
+      signature: req.signature,
+    }
   });
+
+  const rewardClaims = [];
+  rewardClaimsArray.forEach((req) => {
+    rewardClaims.push([req.address, req.amount,  req.nonce, req.signature, req.message]);
+  });
+
+  console.log(rewardClaims);
 
   async function submitRewardBatch() {
     try {
         await window.ethereum.request({ method: "eth_requestAccounts" });
         const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const privateKey = "8d1444ef95f13c8d0713e4319463d8d24316940a21a9624b81978d84c6c616f3"; // Admin's private key
+        const privateKey = "749fd5aaae691acca5d7ad99db3ef39065a2fa3c4ea51c22af2c48536746c111"; 
         const sender = new ethers.Wallet(privateKey, provider);
-        const contractAddress = "0xb97e2EF23af04418fD2De96887F3310C11434506";
+        const contractAddress = "0x4Ed91AebEEa5857204d8f073aCAD9Dbbb0B57d8e";
         const contract = new ethers.Contract(contractAddress,Transactionabi, sender);
+        console.log("rewardClaims ",rewardClaims[0]);
         await contract.handleBatch(rewardClaims);
     } catch (error) {
       console.error("Error submitting reward batch:", error);

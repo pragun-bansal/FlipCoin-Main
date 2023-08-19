@@ -13,7 +13,7 @@ const requestsSchema = mongoose.Schema({
         type: String,
         required: true,
     },
-    messageHash: {
+    message: {
         type: String,
         required: true,
     },

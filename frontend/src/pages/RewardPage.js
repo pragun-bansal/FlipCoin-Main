@@ -19,6 +19,7 @@ import axios from "../adapters/axios";
 import { BACKEND_URL } from "../bkd";
 import { useSelector } from "react-redux";
 import {useHistory} from "react-router-dom"
+import Transactionabi from "../utils/transactionsabi.json";
 
 // const achievements = [
 //   {
@@ -165,35 +166,6 @@ const Rewards = () => {
     connectWallet();
   }, []);
 
-  const verifyRewardClaim = async (rewardClaim) => {
-    try {
-      const { userAddress, rewardAmount, nonce, signature } = rewardClaim;
-      console.log("Verifying reward claim:", rewardClaim);
-
-      const message = ethers.utils.defaultAbiCoder.encode(
-        ["address", "uint256", "uint256"],
-        [userAddress, rewardAmount, nonce]
-      );
-
-      const messageHash = ethers.utils.keccak256(message);
-
-      const recoveredAddress = await ethers.utils.verifyMessage(
-        ethers.utils.arrayify(messageHash),
-        signature
-      );
-
-      if (recoveredAddress.toLowerCase() === userAddress.toLowerCase()) {
-        console.log("Signature is valid. Reward claim verified.");
-        return true;
-      } else {
-        console.log("Invalid signature. Reward claim verification failed.");
-        return false;
-      }
-    } catch (error) {
-      console.error("Error verifying reward claim:", error);
-      return false;
-    }
-  };
 
   const claimrewardfunc = async (rewardAmount,achievementid) => {
     try {
@@ -201,43 +173,26 @@ const Rewards = () => {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const accounts = await provider.listAccounts();
       const signer = provider.getSigner(accounts[1]);
-      // const signer = provider.getSigner();
       const userAddress = await signer.getAddress();
-      const rewardAmount = 1; // Replace with the actual reward amount
-      const nonce = Math.floor(Math.random() * 1000000); // Generate a nonce
-     
-      const message = ethers.utils.defaultAbiCoder.encode(
-        ["address", "uint256", "uint256"],
-        [userAddress, rewardAmount, nonce]
-      );
-      console.log(message);
 
-      console.log("Reward claim signature:", message);
-      const messageHash = ethers.utils.keccak256(message);
-      const signature = await signer.signMessage(
-        ethers.utils.arrayify(messageHash)
-      );
+      const nonce = Math.floor(Math.random() * 1000000); 
+      const contract = new ethers.Contract('0x974106287971A6f154d5FEa9231a329408b73f4f',Transactionabi,signer)
+      const message = "secret message";
+      let messageHash = await contract.getMessageHash(rewardAmount,message , nonce);
+      const signature = await signer.signMessage( ethers.utils.arrayify(messageHash) );
 
-      
-      const rewardClaim = {
-        userAddress: userAddress,
-        rewardAmount: rewardAmount,
-        nonce: nonce,
-        signature: signature,
-        messageHash: messageHash,
-      };
-
-      verifyRewardClaim(rewardClaim);
+  
       axios.post(`${BACKEND_URL}/requests`,{
         address: userAddress,
         amount: rewardAmount,
         nonce: nonce,
         signature: signature,
-        messageHash: messageHash,
+        message: message,
         userid: userid,
         achievementid:achievementid,
         approved: false
       })
+
     } catch (error) {
       console.error("Error claiming reward:", error);
     }
@@ -275,7 +230,7 @@ const Rewards = () => {
                 <button
                   className="py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 active:bg-blue-700 disabled:opacity-50 mt-4 w-full flex items-center justify-center gap-2"
                   disabled={isAnimating}
-                  onClick={()=>{reward();claimrewardfunc(0,ach._id)}}
+                  onClick={()=>{reward();claimrewardfunc(ach.reward,ach._id)}}
                 >
                   {(
                     <div id="rewardId" className="w-full h-full ">
@@ -400,80 +355,3 @@ const Rewards = () => {
 };
 
 export default Rewards;
-
-// const RewardPage = () => {
-//   const classes = useStyle();
-//     const useStyle = makeStyles((theme) => ({
-//       component: {
-//         marginTop: 55,
-//         padding: "30px 6%",
-//         display: "flex",
-//         spacing: 4,
-//       },
-//       leftComponent: {
-//         paddingRight: 15,
-//         [theme.breakpoints.between(0, 960)]: {
-//           paddingRight: 0,
-//           marginBottom: 20,
-//         },
-//       },
-//       header: {
-//         padding: "15px 24px",
-//         background: "#fff",
-//       },
-//       bottom: {
-//         padding: "16px 22px",
-//         background: "#fff",
-//         boxShadow: "0 -2px 10px 0 rgb(0 0 0 / 10%)",
-//         borderTop: "1px solid #f0f0f0",
-//       },
-//       placeOrder: {
-//         display: "flex",
-//         marginLeft: "auto",
-//         background: "#fb641b",
-//         color: "#fff",
-//         borderRadius: 2,
-//         width: 250,
-//         height: 51,
-//       },
-//     }));
-//   const achievements = [
-//     {
-//       title: "Achievment 1",
-//       description: "First time user",
-//       reward: 100,
-//       minthreshold: 30,
-//       imageuri: "",
-//     },
-//     {
-//       title: "Achievment 1",
-//       description: "First time user",
-//       reward: 100,
-//       minthreshold: 30,
-//       imageuri: "",
-//     },
-//     {
-//       title: "Achievment 1",
-//       description: "First time user",
-//       reward: 100,
-//       minthreshold: 30,
-//       imageuri: "",
-//     },
-//   ];
-//   return (
-//     <Grid className=" mx-auto w-full container   h-auto p-10 mt-24 ">
-//       <div container className={classes.component}>
-//         {achievements.map((ach, idx) => (
-//           <div
-//             className="w-[300px] bg-white text-black shadow rounded"
-//             key={idx}
-//           >
-//             asdasldk
-//           </div>
-//         ))}
-//       </div>
-//     </Grid>
-//   );
-// };
-
-// export default RewardPage;

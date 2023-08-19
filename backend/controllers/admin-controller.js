@@ -10,6 +10,7 @@ const getRequests = async (req, res) => {
     if(user.role !== "admin") return res.status(403).send(`User with id: ${userID} is not an admin`);
     try {
         const requests = await Requests.find({});
+        console.log("requests: " ,requests);
         res.json(requests);
     } catch (error) {
         console.log(error);
