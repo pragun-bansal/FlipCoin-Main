@@ -108,6 +108,6 @@ router.patch("/coupons/:id",updateCoupon);
 router.get("/requests/:userid",getRequests);
 router.patch("/requests/:userid/:reqid",approveRequest);
 router.post("/requests",createRequest);
-router.post("requests/approveBatch",approveBatchRequests)
+router.post("/requests/approveBatch",approveBatchRequests)
 
 module.exports = router;

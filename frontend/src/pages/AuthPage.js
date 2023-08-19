@@ -36,6 +36,7 @@ function AuthPage({ popup = false }) {
         .then((res) => {
           dispatch(setIsAuthenticate(res.isAuth));
           dispatch(setUserInfo(res.user));
+          console.log(res);
           setIsOpen(false);
           history.push("/");
         })

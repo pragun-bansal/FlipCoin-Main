@@ -16,7 +16,7 @@ import OrderFailedPage from "./pages/OrderFailedPage";
 import OrderSuccessPage from "./pages/OrderSuccessPage";
 import monitorImg from './assets/monitors-laptop.png';
 import Rewards from "./pages/RewardPage";
-
+import RedeemPage from "./pages/RedeemPage";
 //css
 import "./App.css";
 import AdminPage from "./pages/AdminPage";
@@ -64,6 +64,9 @@ function App() {
             </Route>
             <Route exact path="/order-failed">
               <OrderFailedPage />
+            </Route>
+            <Route exact path="/redeem">
+              <RedeemPage />
             </Route>
             <Route exact path="/order-success">
               <OrderSuccessPage />

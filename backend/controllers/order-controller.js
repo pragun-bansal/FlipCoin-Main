@@ -4,9 +4,10 @@ const User = require("../models/userSchema");
 const Achievment = require("../models/achievementSchema");
 
 const completeOrder = async (req, res) => {
-  const user = await User.findById(req.body.userId);
-  if (!user) return res.status(400).send("Invalid User");
   try {
+    const user = await User.findById(req.body.userId);
+    if (!user) return res.status(400).send("Invalid User");
+    console.log(user);
     const order = new Order({ ...req.body, orderDate: Date.now() });
     user.totalOrders++;
     user.totalAmount += order.totalAmount;
@@ -20,14 +21,22 @@ const completeOrder = async (req, res) => {
     user.claimedachievements.forEach((achievement) => {
       achivids.add(achievement.achievementId);
     });
+    
 
-    const achievements = Achievment.find({});
+    const achievements = await Achievment.find({});
+
+    const useravailableachievementsids = user.availableachievements.map((achievement) => achievement.achievementId.toString()); 
+    const userclaimedachievementsids = user.claimedachievements.map((achievement) => achievement.achievementId.toString());
+    console.log(useravailableachievementsids);
+    console.log(userclaimedachievementsids);
     const newachievements = [];
     achievements.forEach((achievement) => {
       if (achievement.minorders <= user.totalOrders && achievement.minorderprice <= user.totalAmount) {
-          if(!achivids.has(achievement._id))newachievements.push({achievementId:achievement._id,unlockDate:Date.now()});
+          console.log("Now check ", achievement._id.toString(),"\n")
+          if(!useravailableachievementsids.includes(achievement._id.toString()) && !userclaimedachievementsids.includes(achievement._id.toString())) newachievements.push({achievementId:achievement._id,unlockDate:Date.now()});
       }
     });
+    console.log(newachievements);
     user.availableachievements = user.availableachievements.concat(newachievements);
     await user.save();
   
@@ -37,8 +46,6 @@ const completeOrder = async (req, res) => {
     //     });
     //   }
     // });
-
-
 
     const result = await order.save();
     res.json({ orderId: result._id });

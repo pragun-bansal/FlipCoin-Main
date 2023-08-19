@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Achievment = require("../models/achievementSchema");
 const Requests = require("../models/requestSchema");
 const User = require("../models/userSchema");
 
@@ -58,11 +59,16 @@ const approveBatchRequests = async (req, res) => {
 
 
 const createRequest = async (req, res) => {
-    const userid = req.body.userid;
-    const user = await User.findById(userid);
-    if (!user) return res.status(404).send(`No user with id: ${userid}`);
-    const newRequest = new Requests({ ...req.body, approved: false });
     try {
+        const userid = req.body.userid;
+        const user = await User.findById(userid);
+        if (!user) return res.status(404).send(`No user with id: ${userid}`);
+        const newRequest = new Requests({ ...req.body, approved: false });
+        const achievement = await Achievment.findById(req.body.achievementid);
+        user.claimedachievements.push({ achievementId: achievement._id, unlockDate: Date.now() });
+        user.availableachievements = user.availableachievements.filter((achievement) => achievement.achievementId != req.body.achievementid);
+        await user.save();
+        console.log("user: ", user);
         await newRequest.save();
         res.status(201).json(newRequest);
     }

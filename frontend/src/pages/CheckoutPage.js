@@ -1,16 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
-import {
-  Box,
-  makeStyles,
-  Typography,
-  Grid,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
-  Button,
-} from "@material-ui/core";
+import {Box,makeStyles,Typography,Grid,RadioGroup,FormControlLabel,Radio,Button,} from "@material-ui/core";
 import clsx from "clsx";
 import AddIcon from "@material-ui/icons/Add";
 
@@ -180,12 +171,12 @@ const CheckoutPage = () => {
     if (isAuthenticate) {
       dispatch(getCartItems());
       dispatch(getAddresses());
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 500);
+      setTimeout(() => { setIsLoading(false);}, 500);
     } else {
       history.replace("/login?ref=checkout?init=true");
     }
+
+    setIsLoading(false);
   }, [isAuthenticate]);
 
   useEffect(() => {

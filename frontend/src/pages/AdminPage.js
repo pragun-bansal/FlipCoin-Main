@@ -9,7 +9,6 @@ import {
   CircularProgress,
   Box,
   Modal,
-  Typography,
 } from "@material-ui/core";
 import ToastMessageContainer from "../components/ToastMessageContainer";
 import { ethers } from "ethers";
@@ -18,8 +17,9 @@ import Flcabi from "../utils/flcabi.json";
 import toastMessage from "../utils/toastMessage";
 import { DataGrid } from '@mui/x-data-grid';
 import axios from "../adapters/axios";
-import { BACKEND_URL } from "../bkd";
+import { ADMIN_PVT_KEY, BACKEND_URL, CONTRACT_ADDRESS } from "../bkd";
 import { useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
 
 
 const useStyle = makeStyles((theme) => ({
@@ -71,11 +71,11 @@ const useStyle = makeStyles((theme) => ({
 
 const AdminPage = () => {
   const classes = useStyle();
+
   const [open, setOpen] = useState(false);
   const [fundValue,setFundValue] = useState("");
   const [reciveaddress,setReceiveAddress] = useState("");
   const [submitting,setSubmitting] = useState(false);
-
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [imageuri, setImageUri] = useState("");
@@ -83,36 +83,50 @@ const AdminPage = () => {
   const [minorderprice, setMinOrderPrice] = useState("");
   const [minorders, setMinOrders] = useState("");
   const [rewardAmount, setRewardAmount] = useState("");
-  
   const [requests, setRequests] = useState([]);
-
   const [showApproved, setShowApproved] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [rewardClaimsArray, setRewardClaimsArray] = useState([]);
+  const [rewardClaims, setRewardClaims] = useState([]);
 
   const {user} = useSelector((state) => state.userReducer);
   let userid 
   if(user._id) userid = user._id
   else userid = "64e06a77c96091c2139abc82"
-  console.log(userid)
+
+  const history = useHistory();
+
+  if(user.role!=='admin'){
+    history.push('/');
+  }
+
 
   useEffect(() => {
     const getRequests = async () => {
       const  {data}  = await axios.get(`${BACKEND_URL}/requests/${userid}`);
       setRequests(data);
+      setRewardClaimsArray(data.map((req) => {
+        return{
+          id: req._id,
+          address: req.address,
+          amount: req.amount,
+          approved: req.approved,
+          message: req.message,
+          nonce: req.nonce,
+          signature: req.signature,
+        }
+      }));
+      let temparr = [];
+      rewardClaimsArray.filter((req)=>req.approved===false).forEach((req) => {
+        temparr.push([req.address, req.amount,  req.nonce, req.signature, req.message]);
+      })
+      setRewardClaims(temparr);
+      setLoading(false);
     };
     getRequests();
-  }, [userid]);
+  }, [userid,rewardClaimsArray]);
 
   
-  const columns = [
-    { field: 'id', headerName: 'ID', width: 70 },
-    { field: 'address', headerName: 'User Address', width: 200 },
-    { field: 'amount', headerName: 'FLC', width: 80 },
-    { field: 'nonce', headerName: 'Nonce',width: 90 },
-    { field: 'message', headerName: 'Message',width: 160,},
-    { field: 'signature', headerName: 'Signature',width: 160,},
-  ];
-  
-
   const handleOpen = () => {
     setOpen(true);
   };
@@ -120,64 +134,60 @@ const AdminPage = () => {
   const handleClose = () => {
     setOpen(false);
   };
-    
-
-  const rewardClaimsArray = requests.map((req) => {
-    return{
-      id: req._id,
-      address: req.address,
-      amount: req.amount,
-      approved: req.approved,
-      message: req.message,
-      nonce: req.nonce,
-      signature: req.signature,
-    }
-  });
-
-  const rewardClaims = [];
-  rewardClaimsArray.filter((req)=>req.approved==false).forEach((req) => {
-    rewardClaims.push([req.address, req.amount,  req.nonce, req.signature, req.message]);
-  });
-
-  console.log(rewardClaims);
-
+  
   async function submitRewardBatch() {
+    setLoading(true);
     try {
-      console.log(window.ethereum);
+        const PendingRequests = requests.filter((req)=>req.approved===false);
+        if(PendingRequests.length===0){
+          toastMessage("No requests to approve", "error");
+          setLoading(false);
+          return;
+        }
         await window.ethereum.request({ method: "eth_requestAccounts" });
         const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const privateKey = "46dd819018d9fb9190ba4fee325243ce1cef146d06ef6df5ac7468adeba78fda"; 
-        const sender = new ethers.Wallet(privateKey, provider);
-        const contractAddress = "0xBF548039835B7850FdF5B76B1233FDD59D36c322";
-        const contract = new ethers.Contract(contractAddress,Transactionabi, sender);
-        console.log("rewardClaims ",rewardClaims[0]);
+        const sender = new ethers.Wallet(ADMIN_PVT_KEY, provider);
+        const contract = new ethers.Contract(CONTRACT_ADDRESS,Transactionabi, sender);
         await contract.handleBatch(rewardClaims);
-        const approve = axios.post(`${BACKEND_URL}/requests/approveBatch`, requests.filter((req)=>req.approved==false));
+        axios.post(`${BACKEND_URL}/requests/approveBatch`,{ inputs: requests.filter((req)=>req.approved===false)}).then(
+          async (res) => {
+            const  {data}  = await axios.get(`${BACKEND_URL}/requests/${userid}`);
+            setRequests(data);
+            setRewardClaimsArray(data.map((req) => {
+              return{
+                id: req._id,
+                  address: req.address,
+                  amount: req.amount,
+                  approved: req.approved,
+                  message: req.message,
+                  nonce: req.nonce,
+                  signature: req.signature,
+                }
+            }));
+            let temparr = [];
+            rewardClaimsArray.filter((req)=>req.approved===false).forEach((req) => {
+              temparr.push([req.address, req.amount,  req.nonce, req.signature, req.message]);
+            })
+            setRewardClaims(temparr);
+            toastMessage("Reward Batch Submitted Successfully","success");
+            setLoading(false);
 
+          }
+        )
     } catch (error) {
-      console.error("Error submitting reward batch:", error);
+      toastMessage("Error Occured while approving requests. Please try again later.","error");
+      console.log("error", error);  
+      setLoading(false);
     }
   }
 
   async function fundRequestHandler() {
     try {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      // const privateKey ="8d1444ef95f13c8d0713e4319463d8d24316940a21a9624b81978d84c6c616f3"; // Admin's private key
-      // const sender = new ethers.Wallet(privateKey, provider);
       const signer = await provider.getSigner();
-      const contract = new ethers.Contract("0xc1c62B3f6Ba557233f4Fe93C0e824Ae04234666F",Flcabi,signer);
-      console.log("contract",contract);
-      
+      const contract = new ethers.Contract(CONTRACT_ADDRESS,Flcabi,signer);
       const val = ethers.utils.parseEther(fundValue);
-      console.log("val",val);
-
-      try{
-        await contract.transfer(reciveaddress,val);
-      } catch(error){
-        toastMessage("Error Occured while transferring FLC. Please try again later.","error");
-        console.log("error",error);
-      }
-
+      await contract.transfer(reciveaddress,val);
       setSubmitting(true);
       contract.on("Transfer", (from, to, value) => {
         toastMessage("FLC transferred successfully.","success");
@@ -185,8 +195,8 @@ const AdminPage = () => {
         setFundValue("");
         setReceiveAddress("");
       });
-
     } catch (error) {
+      toastMessage("Error Occured while transferring FLC. Please try again later.","error");
       console.error("Error submitting reward batch:", error);
     }
   }
@@ -194,7 +204,6 @@ const AdminPage = () => {
   const createachievement = async () => {
     console.log("createachievement");
     try {
-      console.log(userid);
       axios.post(`${BACKEND_URL}/achievements/add`, {
         title: title,
         description: description,
@@ -205,16 +214,40 @@ const AdminPage = () => {
         reward: rewardAmount,
         userId: userid,
       });
+      toastMessage("Achievement Created Successfully","success");
+      setTitle("");
+      setDescription("");
+      setImageUri("");
+      setIdentifier("");
+      setMinOrderPrice("");
+      setMinOrders("");
+      setRewardAmount("");
+      handleClose();
     } catch (error) {
       console.log(error);
     }
   }
 
+  const columns = [
+    { field: 'id', headerName: 'ID', width: 70 },
+    { field: 'address', headerName: 'User Address', width: 200 },
+    { field: 'amount', headerName: 'FLC', width: 80 },
+    { field: 'nonce', headerName: 'Nonce',width: 90 },
+    { field: 'message', headerName: 'Message',width: 160,},
+    { field: 'signature', headerName: 'Signature',width: 160,},
+  ];
+  
+
+  if(loading) return(
+    <div className="flex justify-center items-center h-screen">
+      <CircularProgress />
+    </div>
+  )
+
+
   return (
     <div>
-    
-   
-
+  
     <Grid container className={classes.component}>
       <div className={classes.leftSection}>
        {!showApproved ?<DataGrid

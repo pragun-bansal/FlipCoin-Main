@@ -6,6 +6,7 @@ const authentication = async () => {
     const { data } = await axios.get(`${BACKEND_URL}/accounts/authentication`, {
       withCredentials: true,
     });
+    console.log(data);
     return {
       isAuth: data.isAuthenticate,
       user: data.user,

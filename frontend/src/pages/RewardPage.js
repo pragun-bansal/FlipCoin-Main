@@ -1,55 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useReward } from "react-rewards";
-import {
-  makeStyles,
-  Grid,
-  Box,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Container,
-} from "@material-ui/core";
+import { makeStyles, Grid, Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Container, CircularProgress,} from "@material-ui/core";
 import ToastMessageContainer from "../components/ToastMessageContainer";
 import { ethers } from "ethers";
 import Flcabi from "../utils/flcabi.json";
 import { AiFillLock } from "react-icons/ai";
 import axios from "../adapters/axios";
-import { BACKEND_URL } from "../bkd";
-import { useSelector } from "react-redux";
+import { ADMIN_PVT_KEY, BACKEND_URL, CONTRACT_ADDRESS, TOKEN_ADDRESS } from "../bkd";
+import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import Transactionabi from "../utils/transactionsabi.json";
+import toastMessage from "../utils/toastMessage";
+import authentication from "../adapters/authentication";
+import { setUserInfo } from "../actions/userActions";
 
-// const achievements = [
-//   {
-//     title: "First Order",
-//     description: "First time user",
-//     reward: 100,
-//     minthreshold: 30,
-//     isEligible: true,
-//     imageuri: "",
-//     claimed: false,
-//   },
-//   {
-//     title: "Spend more than ₹2000",
-//     description: "First time user",
-//     reward: 100,
-//     minthreshold: 30,
-//     isEligible: false,
-//     imageuri: "",
-//     claimed: false,
-//   },
-//   {
-//     title: "Spend a total of ₹5000",
-//     description: "First time user",
-//     reward: 100,
-//     minthreshold: 30,
-//     isEligible: true,
-//     imageuri: "",
-//     claimed: true,
-//   },
-// ];
 
 const useStyle = makeStyles((theme) => ({
   component: {
@@ -87,61 +51,66 @@ const useStyle = makeStyles((theme) => ({
 }));
 
 const Rewards = () => {
-  const classes = useStyle();
-  const { reward, isAnimating } = useReward("rewardId", "confetti", {
-    elementCount: 100,
-  });
 
+  const classes = useStyle();
+  const { reward, isAnimating } = useReward("rewardId", "confetti", {elementCount: 100,});
+  
   const [cryptoBalance, setCryptoBalance] = useState(0);
   const [transactions, setTransactions] = useState([]);
   const [popupOpen, setPopupOpen] = useState(false);
   const [availableAchievements, setAvailableAchievements] = useState([]);
   const [claimedAchievements, setClaimedAchievements] = useState([]);
   const [lockedAchievements, setLockedAchievements] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const { user } = useSelector((state) => state.userReducer);
+  const { user,isAuthenticate } = useSelector((state) => state.userReducer);
   let userid;
   if (user._id) userid = user._id;
-  else userid = "64e06a77c96091c2139abc82";
+  console.log("userid: ", userid);
+  // else userid = "64e06a77c96091c2139abc82";
+  const dispatch = useDispatch();
+  const history = useHistory();
+
+  if(!isAuthenticate){
+    toastMessage("Please login to enter Flipkart Rewards", "error");
+    history.push("/login");
+  }
+
   useEffect(() => {
-    // if(!user.isAuthenticate){
-    //   window.location.replace("/login");
-    // }
+    authentication().then((res) => {
+      console.log("user: ", res);
+      dispatch(setUserInfo(res.user))
+    })
+  }, [dispatch]);
+
+  useEffect(() => {
     const getAchievments = async () => {
       let { data } = await axios.get(`${BACKEND_URL}/achievements`);
       data = data.filter((achievement) => achievement.active);
-      console.log(data);
 
-      // const availableAchievements = data.filter((achievement) => user.availableachievements.includes(achievement._id));
-      // console.log("availableAchievements: ", availableAchievements);
-      // setAvailableAchievements(availableAchievements);
+      console.log("user availableachievements: ", user.availableachievements);
+      console.log("user claimedachievements: ", user.claimedachievements);
+      console.log("data: ", data);
 
-      // const claimedAchievements = data.filter((achievement) => user.claimedachievements.includes(achievement._id));
-      // setClaimedAchievements(claimedAchievements);
+      // in case any object of user.availableachievements has achievementId == data's achievementId
+      // then that achievement is available to user
+      const useravailableachievementsids = user.availableachievements.map((achievement) => achievement.achievementId);
+      let temp = data.filter((achievement) => useravailableachievementsids.includes(achievement._id));
+      setAvailableAchievements(temp);
 
-      // const lockedAchievements = data.filter((achievement) => !(user.availableachievements.includes(achievement._id) || user.claimedachievements.includes(achievement._id)));
-      // setLockedAchievements(lockedAchievements);
-      const avail = ["64e0586994c36a0c23daa8f7"];
-      const claimed = ["64dfb86d0d337d557aab7e7c"];
+      const userclaimedachievementsids = user.claimedachievements.map((achievement) => achievement.achievementId);
+      console.log("userclaimedachievementsids: ", userclaimedachievementsids);
+      temp  = data.filter((achievement) => userclaimedachievementsids.includes(achievement._id));
+      setClaimedAchievements(temp);
 
-      const availableAchievements = data.filter((achievement) =>
-        avail.includes(achievement._id)
-      );
+      temp = data.filter((achievement) => !(useravailableachievementsids.includes(achievement._id) || userclaimedachievementsids.includes(achievement._id)));
+      setLockedAchievements(temp);
+
       console.log("availableAchievements: ", availableAchievements);
-      setAvailableAchievements(availableAchievements);
+      console.log("claimedAchievements: ", claimedAchievements);
+      console.log("lockedAchievements: ", lockedAchievements);
 
-      const claimedAchievements = data.filter((achievement) =>
-        claimed.includes(achievement._id)
-      );
-      setClaimedAchievements(claimedAchievements);
-
-      const lockedAchievements = data.filter(
-        (achievement) =>
-          !(
-            avail.includes(achievement._id) || claimed.includes(achievement._id)
-          )
-      );
-      setLockedAchievements(lockedAchievements);
+      setLoading(false);
     };
     getAchievments();
   }, []);
@@ -150,19 +119,11 @@ const Rewards = () => {
 
   const connectWallet = async () => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const privateKey =
-      "8d1444ef95f13c8d0713e4319463d8d24316940a21a9624b81978d84c6c616f3"; // Admin's private key
-    const sender = new ethers.Wallet(privateKey, provider);
+    const sender = new ethers.Wallet(ADMIN_PVT_KEY, provider);
     const signer = provider.getSigner();
-    const contract = new ethers.Contract(
-      "0xc1c62B3f6Ba557233f4Fe93C0e824Ae04234666F",
-      Flcabi,
-      sender
-    );
+    const contract = new ethers.Contract(TOKEN_ADDRESS, Flcabi,sender);
     const walletaddress = await signer.getAddress();
-    console.log("sender's address is: ", walletaddress);
     const balance = await contract.balanceOf(walletaddress);
-    console.log("balance: ", balance);
     setCryptoBalance(ethers.utils.formatEther(balance));
   };
 
@@ -175,24 +136,14 @@ const Rewards = () => {
       await window.ethereum.request({ method: "eth_requestAccounts" });
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const accounts = await provider.listAccounts();
-      const signer = provider.getSigner(accounts[1]);
+      const signer = provider.getSigner(accounts[0]);
       const userAddress = await signer.getAddress();
 
       const nonce = Math.floor(Math.random() * 1000000);
-      const contract = new ethers.Contract(
-        "0x974106287971A6f154d5FEa9231a329408b73f4f",
-        Transactionabi,
-        signer
-      );
+      const contract = new ethers.Contract(CONTRACT_ADDRESS ,Transactionabi,signer);
       const message = "secret message";
-      let messageHash = await contract.getMessageHash(
-        rewardAmount,
-        message,
-        nonce
-      );
-      const signature = await signer.signMessage(
-        ethers.utils.arrayify(messageHash)
-      );
+      let messageHash = await contract.getMessageHash(rewardAmount,message,nonce);
+      const signature = await signer.signMessage(ethers.utils.arrayify(messageHash));
 
       axios.post(`${BACKEND_URL}/requests`, {
         address: userAddress,
@@ -204,10 +155,24 @@ const Rewards = () => {
         achievementid: achievementid,
         approved: false,
       });
+
+      window.location.reload();
+
+      toastMessage("Reward claimed successfully", "success");
     } catch (error) {
       console.error("Error claiming reward:", error);
     }
+
+    // add to claimed achievements
+    const temp = availableAchievements.filter((achievement) => achievement._id === achievementid);
+    setClaimedAchievements([...claimedAchievements, ...temp]);
   };
+
+  if(loading) return(
+    <div className="flex justify-center items-center h-screen">
+      <CircularProgress />
+    </div>
+  )
 
   return (
     <Container maxWidth={"lg"} className="mx-auto">
@@ -328,25 +293,10 @@ const Rewards = () => {
         <Box className={classes.header}>
           Your Flipcoins balance is {cryptoBalance} FLC
         </Box>
-        <Button onClick={() => setPopupOpen(true)}>Show Transactions</Button>
 
         {/* <Button onClick={()=>{claimrewardfunc(0,0)}}>Claim Reward</Button> */}
       </Grid>
-      <Dialog open={popupOpen} onClose={() => setPopupOpen(false)}>
-        <DialogTitle>Latest Transactions</DialogTitle>
-        <DialogContent>
-          {transactions.map((tx) => (
-            <div key={tx.hash}>
-              <p>{tx.to}</p>
-              <p>Value: {tx.value} ETH</p>
-              <p>Status: {tx.confirmed ? "Confirmed" : "Pending"}</p>
-            </div>
-          ))}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setPopupOpen(false)}>Close</Button>
-        </DialogActions>
-      </Dialog>
+   
       <ToastMessageContainer />
     </Container>
   );
