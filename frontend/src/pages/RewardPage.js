@@ -1,20 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useReward } from "react-rewards";
-import { makeStyles, Grid, Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Container, CircularProgress, Typography, } from "@material-ui/core";
+import { makeStyles, Grid, Container, CircularProgress, } from "@material-ui/core";
 import ToastMessageContainer from "../components/ToastMessageContainer";
 import { ethers } from "ethers";
-import Flcabi from "../utils/flcabi.json";
 import { AiFillLock } from "react-icons/ai";
 import axios from "../adapters/axios";
-import { ADMIN_PVT_KEY, BACKEND_URL, CONTRACT_ADDRESS, TOKEN_ADDRESS } from "../bkd";
+import {  BACKEND_URL, CONTRACT_ADDRESS } from "../bkd";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import Transactionabi from "../utils/transactionsabi.json";
 import toastMessage from "../utils/toastMessage";
 import authentication from "../adapters/authentication";
 import { setUserInfo } from "../actions/userActions";
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
 
 
 const useStyle = makeStyles((theme) => ({
@@ -53,33 +50,6 @@ const useStyle = makeStyles((theme) => ({
   },
 }));
 
-function TabPanel(props) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`full-width-tabpanel-${index}`}
-      aria-labelledby={`full-width-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
-    </div>
-  );
-}
-
-
-function a11yProps(index) {
-  return {
-    id: `full-width-tab-${index}`,
-    'aria-controls': `full-width-tabpanel-${index}`,
-  };
-}
 
 
 const Rewards = () => {
@@ -87,13 +57,9 @@ const Rewards = () => {
   const classes = useStyle();
   const { reward, isAnimating } = useReward("rewardId", "confetti", {elementCount: 100,});
 
-  const [value, setValue] = React.useState(0);
+  
 
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
 
-  const [cryptoBalance, setCryptoBalance] = useState(0);
   const [transactions, setTransactions] = useState([]);
   const [popupOpen, setPopupOpen] = useState(false);
   const [availableAchievements, setAvailableAchievements] = useState([]);
@@ -101,100 +67,99 @@ const Rewards = () => {
   const [lockedAchievements, setLockedAchievements] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const [sentTransactions, setSentTransactions] = useState([]);
-  const [receivedTransactions, setReceivedTransactions] = useState([]);
+  
 
-  // const { user,isAuthenticate } = useSelector((state) => state.userReducer);
-  const user = {
-    "_id": {
-      "$oid": "64e067592f2b67f1c0e81fa9"
-    },
-    "fname": "Shivam",
-    "lname": "Gupta",
-    "password": "$2a$12$QIcTrEiLhxAL6rthb1iKhOImIA6olIGrkhA1CCE1MIqG3kMHfUR9m",
-    "phone": 7015145611,
-    "role": "admin",
-    "totalOrders": 15,
-    "totalAmount": 945184,
-    "claimedachievements": [
-      {
-        "achievementId": {
-          "$oid": "64e0cfce3180bd12b0734131"
-        },
-        "claimedDate": {
-          "$date": "2023-08-19T14:37:28.477Z"
-        },
-        "_id": {
-          "$oid": "64e0d3d9abfd8f388b82123e"
-        }
-      },
-      {
-        "achievementId": {
-          "$oid": "64e0d137a1da333ed344579b"
-        },
-        "claimedDate": {
-          "$date": "2023-08-19T14:37:28.477Z"
-        },
-        "_id": {
-          "$oid": "64e0d3e2abfd8f388b821265"
-        }
-      },
-      {
-        "achievementId": {
-          "$oid": "64e0ccfb85b8439299b785dd"
-        },
-        "claimedDate": {
-          "$date": "2023-08-19T14:45:32.311Z"
-        },
-        "_id": {
-          "$oid": "64e0d5a699340f591144a497"
-        }
-      }
-    ],
-    "availableachievements": [
-      {
-        "achievementId": {
-          "$oid": "64e0d2cf58d65abfae0564a1"
-        },
-        "unlockDate": {
-          "$date": "2023-08-19T14:45:48.803Z"
-        },
-        "_id": {
-          "$oid": "64e0d59c99340f591144a47a"
-        }
-      }
-    ],
-    "tokens": [
-      {
-        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGUwNjc1OTJmMmI2N2YxYzBlODFmYTkiLCJpYXQiOjE2OTI0NTE1OTd9.l9GsTEmkxWUL-zddKZZNdOw-5ZQ3HjK3DLhbbSDmYS8",
-        "_id": {
-          "$oid": "64e0c30d1e3ae320de4d881f"
-        }
-      },
-      {
-        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGUwNjc1OTJmMmI2N2YxYzBlODFmYTkiLCJpYXQiOjE2OTI0NTE3ODZ9.EbBTV8QP7MWnsEX-X7caZqckMcSeRbF1qoPJE3ZWzns",
-        "_id": {
-          "$oid": "64e0c3ca1e3ae320de4d8850"
-        }
-      },
-      {
-        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGUwNjc1OTJmMmI2N2YxYzBlODFmYTkiLCJpYXQiOjE2OTI0NTE5NDV9.hQpW-6iHmlD1SJJ6zu3BIMmcM4p6vWf3ttTEPmox2xM",
-        "_id": {
-          "$oid": "64e0c4691e3ae320de4d8871"
-        }
-      },
-      {
-        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGUwNjc1OTJmMmI2N2YxYzBlODFmYTkiLCJpYXQiOjE2OTI0NTIwMDd9.e15itZoKXLht7uT2MsmYTC826J15My7Zmb47GECxC6Q",
-        "_id": {
-          "$oid": "64e0c4a71e3ae320de4d8886"
-        }
-      }
-    ],
-    "__v": 37,
-    "availableCoupons": []
-  }
+  const { user,isAuthenticate } = useSelector((state) => state.userReducer);
+  // const user = {
+  //   "_id": {
+  //     "$oid": "64e067592f2b67f1c0e81fa9"
+  //   },
+  //   "fname": "Shivam",
+  //   "lname": "Gupta",
+  //   "password": "$2a$12$QIcTrEiLhxAL6rthb1iKhOImIA6olIGrkhA1CCE1MIqG3kMHfUR9m",
+  //   "phone": 7015145611,
+  //   "role": "admin",
+  //   "totalOrders": 15,
+  //   "totalAmount": 945184,
+  //   "claimedachievements": [
+  //     {
+  //       "achievementId": {
+  //         "$oid": "64e0cfce3180bd12b0734131"
+  //       },
+  //       "claimedDate": {
+  //         "$date": "2023-08-19T14:37:28.477Z"
+  //       },
+  //       "_id": {
+  //         "$oid": "64e0d3d9abfd8f388b82123e"
+  //       }
+  //     },
+  //     {
+  //       "achievementId": {
+  //         "$oid": "64e0d137a1da333ed344579b"
+  //       },
+  //       "claimedDate": {
+  //         "$date": "2023-08-19T14:37:28.477Z"
+  //       },
+  //       "_id": {
+  //         "$oid": "64e0d3e2abfd8f388b821265"
+  //       }
+  //     },
+  //     {
+  //       "achievementId": {
+  //         "$oid": "64e0ccfb85b8439299b785dd"
+  //       },
+  //       "claimedDate": {
+  //         "$date": "2023-08-19T14:45:32.311Z"
+  //       },
+  //       "_id": {
+  //         "$oid": "64e0d5a699340f591144a497"
+  //       }
+  //     }
+  //   ],
+  //   "availableachievements": [
+  //     {
+  //       "achievementId": {
+  //         "$oid": "64e0d2cf58d65abfae0564a1"
+  //       },
+  //       "unlockDate": {
+  //         "$date": "2023-08-19T14:45:48.803Z"
+  //       },
+  //       "_id": {
+  //         "$oid": "64e0d59c99340f591144a47a"
+  //       }
+  //     }
+  //   ],
+  //   "tokens": [
+  //     {
+  //       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGUwNjc1OTJmMmI2N2YxYzBlODFmYTkiLCJpYXQiOjE2OTI0NTE1OTd9.l9GsTEmkxWUL-zddKZZNdOw-5ZQ3HjK3DLhbbSDmYS8",
+  //       "_id": {
+  //         "$oid": "64e0c30d1e3ae320de4d881f"
+  //       }
+  //     },
+  //     {
+  //       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGUwNjc1OTJmMmI2N2YxYzBlODFmYTkiLCJpYXQiOjE2OTI0NTE3ODZ9.EbBTV8QP7MWnsEX-X7caZqckMcSeRbF1qoPJE3ZWzns",
+  //       "_id": {
+  //         "$oid": "64e0c3ca1e3ae320de4d8850"
+  //       }
+  //     },
+  //     {
+  //       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGUwNjc1OTJmMmI2N2YxYzBlODFmYTkiLCJpYXQiOjE2OTI0NTE5NDV9.hQpW-6iHmlD1SJJ6zu3BIMmcM4p6vWf3ttTEPmox2xM",
+  //       "_id": {
+  //         "$oid": "64e0c4691e3ae320de4d8871"
+  //       }
+  //     },
+  //     {
+  //       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGUwNjc1OTJmMmI2N2YxYzBlODFmYTkiLCJpYXQiOjE2OTI0NTIwMDd9.e15itZoKXLht7uT2MsmYTC826J15My7Zmb47GECxC6Q",
+  //       "_id": {
+  //         "$oid": "64e0c4a71e3ae320de4d8886"
+  //       }
+  //     }
+  //   ],
+  //   "__v": 37,
+  //   "availableCoupons": []
+  // }
 
-  const isAuthenticate = true;
+  // const isAuthenticate = true;
 
 
   let userid;
@@ -208,59 +173,6 @@ const Rewards = () => {
     toastMessage("Please login to enter Flipkart Rewards", "error");
     history.push("/login");
   }
-
-  
-  useEffect(() => {
-    const getTransactionHistory = async () => {
-      console.log("getTransactionHistory");
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      await provider.send("eth_requestAccounts", []);
-      const sender = new ethers.Wallet(ADMIN_PVT_KEY, provider);
-      const signer = provider.getSigner();
-      const tokenContract = new ethers.Contract(TOKEN_ADDRESS, Flcabi,sender);
-      const walletAddress = await signer.getAddress();
-      await provider.send("eth_requestAccounts", []);
-      console.log(walletAddress);
-
-      const filter = tokenContract.filters.Transfer(walletAddress, null);
-      const transferEventsSent = await tokenContract.queryFilter(filter);
-      transferEventsSent.reverse();
-
-      console.log("Fetching sent transactions")
-
-      const tmp = [];
-      transferEventsSent.forEach(async(tx) => {
-        const ev = await tx.getBlock()
-        const datetx = new Date(ev.timestamp*1000);
-        tmp.push({
-          to: tx.args.to,
-          amount: ethers.utils.formatEther(tx.args.value),
-          date: datetx.toLocaleString()
-        });
-      });
-
-      setSentTransactions(tmp.reverse());
-
-      const filter2 = tokenContract.filters.Transfer(null, walletAddress);
-      const transferEventsReceived = await tokenContract.queryFilter(filter2);
-
-      const tmp2 = [];
-      transferEventsReceived.forEach(async(tx) => {
-        const ev = await tx.getBlock()
-        const datetx = new Date(ev.timestamp*1000);
-        tmp2.push({
-          from: tx.args.from,
-          amount: ethers.utils.formatEther(tx.args.value),
-          date: datetx.toLocaleString()
-        });
-      });
-
-      setReceivedTransactions(tmp2.reverse());
-      console.log("Fetching received transactions",receivedTransactions)
-
-    }
-    getTransactionHistory();
-  }, []);
 
 
   useEffect(() => {
@@ -304,20 +216,7 @@ const Rewards = () => {
 
   // user state from redux
 
-  const connectWallet = async () => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    await provider.send("eth_requestAccounts", []);
-    const sender = new ethers.Wallet(ADMIN_PVT_KEY, provider);
-    const signer = provider.getSigner();
-    const contract = new ethers.Contract(TOKEN_ADDRESS, Flcabi,sender);
-    const walletaddress = await signer.getAddress();
-    const balance = await contract.balanceOf(walletaddress);
-    setCryptoBalance(ethers.utils.formatEther(balance));
-  };
 
-  useEffect(() => {
-    connectWallet();
-  }, []);
 
 
 
@@ -484,51 +383,7 @@ const Rewards = () => {
           </div>
         ))}
       </Grid>
-     
-     <div className="bg-white h-fit mt-24 border-gray rounded-2xl shadow-md w-[50%]">
-      
-          <div className="flex flex-row justify-between items-center p-4 w-full cursor-pointer border-gray-200 border-b-2">
-            <div className="flex flex-row justify-between items-center w-1/2" onClick={()=>setValue(0)}>
-              <p className="text-gray-800 text-lg text-center w-full border-r-2 border-gray-200">Sent Transactions</p>
-            </div>
-            <div className="flex flex-row justify-between items-center w-1/2" onClick={()=>setValue(1)}>
-              <p className="text-gray-800 text-lg text-center w-full border-l-2 border-gray-200">Recived Transactions</p>
-            </div>
-          </div>
-          {/* Creating a swipable view that show data according to value chosen */}
-        <Box sx={{ width: '100%', height: 400, overflowY: 'scroll' }}>
-          {
-            value === 0 ? 
-            
-            <div>
-            {sentTransactions.map((transaction) => (
-              <div className="flex flex-row justify-between items-center p-4 border-b-2 border-gray-200">
-                To: {transaction.to}
-                Money: {transaction.amount}
-                Date: {transaction.date}
-              </div>
-              ))
-            }
-          </div> : <div>
-            {receivedTransactions.map((transaction) => (
-              <div className="flex flex-row justify-between items-center p-4 border-b-2 border-gray-200">
-                From: {transaction.from}
-                Money: {transaction.amount}
-                Date: {transaction.date}
-              </div>
-              ))
-            }
-          </div>
-          }
-      
-        </Box>
-        <div className="flex flex-row justify-between items-center p-4 w-full cursor-pointer border-gray-200 border-t-2">
-          <div className="flex flex-row justify-between items-center w-full px-2 text-center text-lg">
-            FLC in your wallet are {cryptoBalance}
-          </div>
-          </div>
-        </div>
-     
+
 
       </div>
       <ToastMessageContainer />

@@ -20,6 +20,7 @@ import RedeemPage from "./pages/RedeemPage";
 //css
 import "./App.css";
 import AdminRewardsPage from "./pages/AdminPage";
+import FlipcoinPage from "./pages/FlipcoinPage";
 
 
 function App() { 
@@ -70,6 +71,9 @@ function App() {
             </Route>
             <Route exact path="/order-success">
               <OrderSuccessPage />
+            </Route>
+            <Route exact path="/flipwallet">
+              <FlipcoinPage />
             </Route>
             <Route component={ErrorPage} />
           </Switch>
