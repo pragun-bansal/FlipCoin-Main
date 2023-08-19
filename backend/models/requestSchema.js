@@ -31,6 +31,11 @@ const requestsSchema = mongoose.Schema({
         ref: "user",
         required: true,
     },
+    achievementid: {
+        type: mongoose.Schema.ObjectId,
+        ref: "achievment",
+        required: true,
+    },
 });
 
 const Requests = new mongoose.model("requests", requestsSchema);

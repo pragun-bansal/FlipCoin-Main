@@ -22,8 +22,8 @@ const userSchema = mongoose.Schema({
   },
   gender: String,
   email: String,
-  claimedAchivements: [{
-      achivementId: {
+  claimedachievements: [{
+      achievementId: {
         type: mongoose.Schema.ObjectId,
         ref: "achievment",
         required: true,
@@ -38,6 +38,30 @@ const userSchema = mongoose.Schema({
     enum: ["user", "admin"],
     default: "user",
   },
+  totalOrders: {
+    type: Number,
+    default: 0,
+  },
+  totalAmount: {
+    type: Number,
+    default: 0,
+  },
+  availableachievements: [{
+    achievementId: {
+      type: mongoose.Schema.ObjectId,
+      ref: "achievment",
+      required: true,
+    },
+    unlockDate: {
+      type: Date,
+      default: Date.now(),
+    },
+}],
+role: {
+  type: String,
+  enum: ["user", "admin"],
+  default: "user",
+},
   avaiableCoupons: [{
       couponId: {
         type: mongoose.Schema.ObjectId,

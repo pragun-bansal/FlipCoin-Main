@@ -21,11 +21,6 @@ const achievmentSchema = mongoose.Schema({
         type: Number,
         required: true,
     },
-    claimed: {
-        type: Boolean,
-        required: true,
-        default: false,
-    },
     minorders:{
         type: Number,
         required: true,

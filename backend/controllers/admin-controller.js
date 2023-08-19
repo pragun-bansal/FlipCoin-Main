@@ -35,6 +35,28 @@ const approveRequest = async (req, res) => {
     }
 }
 
+const approveBatchRequests = async (req, res) => {
+    try {
+        const inputarr = req.body.inputs;
+       
+        inputarr.forEach(async (input) => {
+            const user = await User.findById(input.userid);
+            if (!user) return res.status(400).send(`No user with id: ${input.userid}`);
+            const request = await Requests.findById(input.reqid);
+            if (!request) return res.status(400).send(`No request with id: ${input.reqid}`);
+            request.approved = true;
+            await request.save();
+        });
+        res.status(200).json({message: "All requests approved"});
+
+
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({ message: error.message });
+    }
+}
+
+
 const createRequest = async (req, res) => {
     const userid = req.body.userid;
     const user = await User.findById(userid);
@@ -51,4 +73,4 @@ const createRequest = async (req, res) => {
 }
 
 
-module.exports = { getRequests, approveRequest,createRequest };
+module.exports = { getRequests, approveRequest,createRequest,approveBatchRequests };

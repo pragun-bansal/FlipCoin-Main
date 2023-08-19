@@ -299,8 +299,8 @@ const AdminPage = () => {
     }
   }
 
-  const createAchivement = async () => {
-    console.log("createAchivement");
+  const createachievement = async () => {
+    console.log("createachievement");
     try {
       console.log(userid);
       axios.post(`${BACKEND_URL}/achievements/add`, {
@@ -409,7 +409,7 @@ const AdminPage = () => {
             <TextField id="minorder" label="Minimum Orders" variant="outlined" onChange={(e)=>setMinOrders(e.target.value)}/>
           </div>
           <div className="flex flex-row justify-center mt-4">
-            <Button variant="contained" color="primary" className="!px-10 !py-2" onClick={createAchivement}>Create Now</Button>
+            <Button variant="contained" color="primary" className="!px-10 !py-2" onClick={createachievement}>Create Now</Button>
           </div>         
         </Box>
       </Modal>

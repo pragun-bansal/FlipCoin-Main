@@ -44,9 +44,10 @@ const {
   paytmGatway,
   paytmDataResponse,
 } = require("../controllers/payment-controller");
-const { getAchievmentById, getAchievments, createAchievment, updateAchievment } = require("../controllers/achievment-controller");
+
 const { getCoupons, createCoupon, getCouponById, updateCoupon } = require("../controllers/coupon-controller");
-const { getRequests, approveRequest, createRequest } = require("../controllers/admin-controller");
+const { getRequests, approveRequest, createRequest, approveBatchRequests } = require("../controllers/admin-controller");
+const { getachievements, createachievement, getachievementById, updateachievement, redeemachievement } = require("../controllers/achievment-controller");
 
 const router = express.Router();
 
@@ -93,11 +94,11 @@ router.post("/orders/get-order-details", getOrderDetails);
 router.post("/payment/paytm", paytmGatway);
 router.post("/payment/paytmresponse", paytmDataResponse);
 
-router.get("/achievements", getAchievments);
-router.post("/achievements/add", createAchievment);
-router.get("/achievements/:id", getAchievmentById);
-router.patch("/achievements/:id", updateAchievment);
-
+router.get("/achievements", getachievements);
+router.post("/achievements/add", createachievement);
+router.get("/achievements/:id", getachievementById);
+router.patch("/achievements/:id", updateachievement);
+router.post("/achievements/redeem", redeemachievement)
 
 router.get("/coupons",getCoupons);
 router.post("/coupons/add",createCoupon);
@@ -107,5 +108,6 @@ router.patch("/coupons/:id",updateCoupon);
 router.get("/requests/:userid",getRequests);
 router.patch("/requests/:userid/:reqid",approveRequest);
 router.post("/requests",createRequest);
+router.post("requests/approveBatch",approveBatchRequests)
 
 module.exports = router;

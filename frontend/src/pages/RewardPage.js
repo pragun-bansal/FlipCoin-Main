@@ -20,35 +20,36 @@ import { BACKEND_URL } from "../bkd";
 import { useSelector } from "react-redux";
 
 
-const achivements = [
-  {
-    title: "First Order",
-    description: "First time user",
-    reward: 100,
-    minthreshold: 30,
-    isEligible: true,
-    imageuri: "",
-    claimed: false,
-  },
-  {
-    title: "Spend more than ₹2000",
-    description: "First time user",
-    reward: 100,
-    minthreshold: 30,
-    isEligible: false,
-    imageuri: "",
-    claimed: false,
-  },
-  {
-    title: "Spend a total of ₹5000",
-    description: "First time user",
-    reward: 100,
-    minthreshold: 30,
-    isEligible: true,
-    imageuri: "",
-    claimed: true,
-  },
-];
+// const achievements = [
+//   {
+//     title: "First Order",
+//     description: "First time user",
+//     reward: 100,
+//     minthreshold: 30,
+//     isEligible: true,
+//     imageuri: "",
+//     claimed: false,
+//   },
+//   {
+//     title: "Spend more than ₹2000",
+//     description: "First time user",
+//     reward: 100,
+//     minthreshold: 30,
+//     isEligible: false,
+//     imageuri: "",
+//     claimed: false,
+//   },
+//   {
+//     title: "Spend a total of ₹5000",
+//     description: "First time user",
+//     reward: 100,
+//     minthreshold: 30,
+//     isEligible: true,
+//     imageuri: "",
+//     claimed: true,
+//   },
+// ];
+
 
 const useStyle = makeStyles((theme) => ({
   component: {
@@ -94,11 +95,23 @@ const Rewards = () => {
   const [cryptoBalance, setCryptoBalance] = useState(0);
   const [transactions, setTransactions] = useState([]);
   const [popupOpen, setPopupOpen] = useState(false);
+  const [achievements, setAchievements] = useState([]);
 
   const {user} = useSelector((state) => state.userReducer);
   let userid 
   if(user._id) userid = user._id
   else userid = "64dfa64139cd4372aa5744c3"
+
+
+  useEffect(() => {
+    const getAchievments = async () => {
+      const { data } = await axios.get(`${BACKEND_URL}/achievements`);
+      console .log(data);
+      setAchievements(data);
+    };
+    getAchievments();
+  }, []);
+
 
   // user state from redux
 
@@ -203,7 +216,7 @@ const Rewards = () => {
   return (
     <Container maxWidth={"lg"} className="mx-auto">
       <Grid container className={classes.component}>
-        {achivements.map((ach, idx) => (
+        {achievements.map((ach, idx) => (
           <div
             className={`w-72 h-[340px] bg-white shadow   relative rounded-md m-4 p-4`}
             key={idx}
@@ -315,7 +328,7 @@ export default Rewards;
 //         height: 51,
 //       },
 //     }));
-//   const achivements = [
+//   const achievements = [
 //     {
 //       title: "Achievment 1",
 //       description: "First time user",
@@ -341,7 +354,7 @@ export default Rewards;
 //   return (
 //     <Grid className=" mx-auto w-full container   h-auto p-10 mt-24 ">
 //       <div container className={classes.component}>
-//         {achivements.map((ach, idx) => (
+//         {achievements.map((ach, idx) => (
 //           <div
 //             className="w-[300px] bg-white text-black shadow rounded"
 //             key={idx}

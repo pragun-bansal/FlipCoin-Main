@@ -1,55 +1,69 @@
-const Achievment = require("../models/achievmentSchema");
+const achievement = require("../models/achievementSchema");
 const mongoose = require("mongoose");
 const User = require("../models/userSchema");
-const getAchievments = async (req, res) => {
+const getachievements = async (req, res) => {
     try {
-        const achievments = await Achievment.find();
-        res.json(achievments);
+        const achievements = await achievement.find();
+        res.json(achievements);
     } catch (error) {
         console.log(error);
         res.status(500).send();
     }
 };
 
-const getAchievmentById = async (req, res) => {
+const getachievementById = async (req, res) => {
     try {
-        const achievment = await Achievment.findById(req.params.id);
-        res.json(achievment);
+        const achievement = await achievement.findById(req.params.id);
+        res.json(achievement);
     } catch (error) {
         console.log(error);
         res.status(500).send();
     }
 }
 
-const createAchievment = async (req, res) => {
-    const achievment = req.body;
+const createachievement = async (req, res) => {
+    const achievement = req.body;
     const userId = mongoose.Types.ObjectId(req.body.userId);
     console.log(req.body);
     const user = await User.findById(userId);
     console.log(user);
     if (!user) return res.status(404).send(`No user with id: ${userId}`);
-    const newAchievment = new Achievment({ ...achievment, claimed: false, active: true });
+    const newachievement = new achievement({ ...achievement, claimed: false, active: true });
     try {
-        await newAchievment.save();
-        res.status(201).json(newAchievment);
+        await newachievement.save();
+        res.status(201).json(newachievement);
     } catch (error) {
         console.log(error);
         res.status(409).json({ message: error.message });
     }
 }
 
-const updateAchievment = async (req, res) => {
+const updateachievement = async (req, res) => {
     try{
         const { id } = req.params;
         const { title, description, image, identifier, minorderprice, claimed, minorders, active, lastdate, reward } = req.body;
-        if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).send(`No achievment with id: ${id}`);
-        const updatedAchievment = { title, description, image, identifier, minorderprice, claimed, minorders, active, lastdate, reward, _id: id };
-        const achievment = await Achievment.findByIdAndUpdate(id, updatedAchievment, { new: true });
-        res.json(achievment);
+        if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).send(`No achievement with id: ${id}`);
+        const updatedachievement = { title, description, image, identifier, minorderprice, claimed, minorders, active, lastdate, reward, _id: id };
+        const achievement = await achievement.findByIdAndUpdate(id, updatedachievement, { new: true });
+        res.json(achievement);
     } catch (error) {
         console.log(error);
         res.status(409).json({ message: error.message });
     }
 }
 
-module.exports= { getAchievments, getAchievmentById, createAchievment, updateAchievment };
+const redeemachievement = async (req, res) => {
+    try {
+        const user = await User.findById(req.body.userId);
+        if (!user) return res.status(400).json({message: `No user with id: ${req.body.userId}`});
+        
+        user.availableachievements = user.availableachievements.filter((achievement) => achievement.achievementid != req.body.achievementid);
+        user.claimedachievements.push({achievementid:req.body.achievementid,claimDate:Date.now()});
+        await user.save();
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({ message: error.message });
+    }
+}
+
+module.exports= { getachievements, getachievementById, createachievement, updateachievement, redeemachievement };
