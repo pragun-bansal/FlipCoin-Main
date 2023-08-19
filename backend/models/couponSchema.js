@@ -19,6 +19,10 @@ const couponSchema = mongoose.Schema({
     delivery:{
         type: Boolean,
         required: true,
+    },
+    cost:{
+        type: Number,
+        required: true,
     }
 });
 
