@@ -45,7 +45,7 @@ const {
   paytmDataResponse,
 } = require("../controllers/payment-controller");
 
-const { getCoupons, createCoupon, getCouponById, updateCoupon } = require("../controllers/coupon-controller");
+const { getCoupons, createCoupon, getCouponById, updateCoupon,redeemCoupons } = require("../controllers/coupon-controller");
 const { getRequests, approveRequest, createRequest, approveBatchRequests } = require("../controllers/admin-controller");
 const { getachievements, createachievement, getachievementById, updateachievement, redeemachievement } = require("../controllers/achievment-controller");
 
@@ -104,6 +104,7 @@ router.get("/coupons",getCoupons);
 router.post("/coupons/add",createCoupon);
 router.get("/coupons/:id",getCouponById);
 router.patch("/coupons/:id",updateCoupon);
+router.post("/couponsredeem",redeemCoupons);
 
 router.get("/requests/:userid",getRequests);
 router.patch("/requests/:userid/:reqid",approveRequest);

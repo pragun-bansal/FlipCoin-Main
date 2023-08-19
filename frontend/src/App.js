@@ -19,7 +19,7 @@ import Rewards from "./pages/RewardPage";
 import RedeemPage from "./pages/RedeemPage";
 //css
 import "./App.css";
-import AdminPage from "./pages/AdminPage";
+import AdminRewardsPage from "./pages/AdminPage";
 
 
 function App() { 
@@ -47,8 +47,8 @@ function App() {
             <Route exact path="/account/addresses">
               <MyAccountsPage />
             </Route>
-            <Route exact path="/admin/rewards">
-              <AdminPage />
+            <Route exact path="/admin">
+              <AdminRewardsPage />
             </Route>
             <Route exact path="/orders">
               <OrdersPage />

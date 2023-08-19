@@ -17,9 +17,11 @@ import Flcabi from "../utils/flcabi.json";
 import toastMessage from "../utils/toastMessage";
 import { DataGrid } from '@mui/x-data-grid';
 import axios from "../adapters/axios";
-import { ADMIN_PVT_KEY, BACKEND_URL, CONTRACT_ADDRESS } from "../bkd";
+import { ADMIN_PVT_KEY, BACKEND_URL, CONTRACT_ADDRESS, TOKEN_ADDRESS } from "../bkd";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 
 const useStyle = makeStyles((theme) => ({
@@ -72,12 +74,21 @@ const useStyle = makeStyles((theme) => ({
 const AdminPage = () => {
   const classes = useStyle();
 
-  const [open, setOpen] = useState(false);
+  const [openReward, setOpenReward] = useState(false);
+  const [openRedeem, setOpenRedeem] = useState(false);
   const [fundValue,setFundValue] = useState("");
   const [reciveaddress,setReceiveAddress] = useState("");
   const [submitting,setSubmitting] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [titleCoupon, setTitleCoupon] = useState("");
+  const [delievery, setDelievery] = useState
+  (false);
+  const [percentageoff, setPercentageoff] = useState("");
+  const [descriptionCoupon, setDescriptionCoupon] = useState("");
+  const [maxoff, setMaxoff] = useState("");
+  const [cost, setCost] = useState("");
+
   const [imageuri, setImageUri] = useState("");
   const [identifier, setIdentifier] = useState("");
   const [minorderprice, setMinOrderPrice] = useState("");
@@ -100,6 +111,10 @@ const AdminPage = () => {
     history.push('/');
   }
 
+  const handleChange1 = (event) => {
+    console.log(delievery," to ", event.target.checked)
+    setDelievery(event.target.checked);
+  };
 
   useEffect(() => {
     const getRequests = async () => {
@@ -124,15 +139,23 @@ const AdminPage = () => {
       setLoading(false);
     };
     getRequests();
-  }, [userid,rewardClaimsArray]);
+  }, []);
 
   
-  const handleOpen = () => {
-    setOpen(true);
+  const handleOpenRedeem = () => {
+    setOpenRedeem(true);
+  };
+  
+  const handleOpenReward = () => {
+    setOpenReward(true);
   };
 
-  const handleClose = () => {
-    setOpen(false);
+  const handleCloseRedeem = () => {
+    setOpenRedeem(false);
+  };
+  
+  const handleCloseReward= () => {
+    setOpenReward(false);
   };
   
   async function submitRewardBatch() {
@@ -185,7 +208,7 @@ const AdminPage = () => {
     try {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = await provider.getSigner();
-      const contract = new ethers.Contract(CONTRACT_ADDRESS,Flcabi,signer);
+      const contract = new ethers.Contract(TOKEN_ADDRESS,Flcabi,signer);
       const val = ethers.utils.parseEther(fundValue);
       await contract.transfer(reciveaddress,val);
       setSubmitting(true);
@@ -222,7 +245,32 @@ const AdminPage = () => {
       setMinOrderPrice("");
       setMinOrders("");
       setRewardAmount("");
-      handleClose();
+      handleCloseReward();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+
+  const createCoupon = async () => {
+    console.log("createCoupon");
+    try {
+      axios.post(`${BACKEND_URL}/coupons/add`, {
+        title: titleCoupon,
+        description: descriptionCoupon,
+        percentageoff:percentageoff,
+        maxoff:maxoff,
+        delievery:delievery,
+        cost:cost
+      });
+      toastMessage("Achievement Created Successfully","success");
+      setTitleCoupon("");
+      setDescriptionCoupon("");
+      setPercentageoff("");
+      setMaxoff("");
+      setDelievery(false);
+      setCost("");
+      handleCloseReward();
     } catch (error) {
       console.log(error);
     }
@@ -309,11 +357,16 @@ const AdminPage = () => {
           <Button variant="contained" color="primary" onClick={submitRewardBatch} className="!mx-auto !my-6 !text-md !px-2 !py-4" >
             Approve all Requests
           </Button>
-          <Button variant="contained" color="primary" onClick={handleOpen} className="!mx-auto !my-6 !text-md !px-2 !py-4" >
+          <Button variant="contained" color="primary" onClick={handleOpenReward} className="!mx-auto !my-6 !text-md !px-2 !py-4" >
             Create New Achievment
           </Button>
         </div>
 
+        <div className="w-full flex flex-row items-center">
+        <Button variant="contained" color="primary" onClick={handleOpenRedeem} className="!mx-auto !my-6 !text-md !px-2 !py-4" >
+            Create New Coupon
+          </Button>
+        </div>
         <div className="w-full flex flex-row items-center">
           <Button variant="contained" color="primary" onClick={()=>setShowApproved(!showApproved)} className="!mx-auto !my-6 !text-md !px-2 !py-4" >
             {showApproved ? "Show Pending" : "Show Approved"}
@@ -324,8 +377,8 @@ const AdminPage = () => {
 
       </div>
       <Modal
-        open={open}
-        onClose={handleClose}
+        open={openReward}
+        onClose={handleCloseReward}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
@@ -355,6 +408,44 @@ const AdminPage = () => {
           </div>
           <div className="flex flex-row justify-center mt-4">
             <Button variant="contained" color="primary" className="!px-10 !py-2" onClick={createachievement}>Create Now</Button>
+          </div>         
+        </Box>
+      </Modal>
+
+      <Modal
+        open={openRedeem}
+        onClose={handleCloseRedeem}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box 
+          sx  = {{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 800,
+            bgcolor: 'background.paper',
+            border: '2px solid #888',
+            boxShadow: 24,
+            p: 4,
+          }}
+        >
+          {/* Creating a form */}
+          <h2 className="text-2xl font-bold mb-6 text-center">Create Coupon</h2>
+          <div className="flex flex-col gap-y-4">
+            <TextField id="title" label="Title" variant="outlined" onChange={(e)=>setTitleCoupon(e.target.value)}/>
+            <TextField id="descriptionCoupon" label="Description Coupon" variant="outlined" multiline onChange={(e)=>setDescriptionCoupon(e.target.value)}/>
+            <TextField id="percentageOff" label="percentageOff" variant="outlined" onChange={(e)=>setPercentageoff(e.target.value)}/>
+            <TextField id="maxoff" label="MaxOff" variant="outlined" onChange={(e)=>setMaxoff(e.target.value)} />
+            <TextField id="cost" label="Cost" variant="outlined" onChange={(e)=>setCost(e.target.value)} />
+            <FormControlLabel
+        id="delievery" label="delievery" 
+        control={<Checkbox checked={delievery} onChange={handleChange1} />}
+      />
+          </div>
+          <div className="flex flex-row justify-center mt-4">
+            <Button variant="contained" color="primary" className="!px-10 !py-2" onClick={createCoupon}>Create Now</Button>
           </div>         
         </Box>
       </Modal>

@@ -16,57 +16,14 @@ import { ethers } from "ethers";
 import Flcabi from "../utils/flcabi.json";
 import { AiFillLock } from "react-icons/ai";
 import axios from "../adapters/axios";
-import { BACKEND_URL } from "../bkd";
-import { useSelector } from "react-redux";
+import { BACKEND_URL, CONTRACT_ADDRESS, TOKEN_ADDRESS } from "../bkd";
+import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import Transactionabi from "../utils/transactionsabi.json";
+import toastMessage from "../utils/toastMessage";
+import authentication from "../adapters/authentication";
+import { setUserInfo } from "../actions/userActions";
 
-const rewards = [
-  {
-    title: "Summer Sale",
-    description: "Get amazing discounts on summer collection!",
-    percentageoff: 25,
-    maxoff: 50,
-    delivery: true,
-    cost: 100, // Sample cost in currency
-  },
-  {
-    title: "Back-to-School Deal",
-    description: "Save big on school supplies and essentials.",
-    percentageoff: 15,
-    maxoff: 30,
-    delivery: true,
-    cost: 50, // Sample cost in currency
-  },
-  {
-    title: "Flash Sale",
-    description: "Hurry, limited-time offer on selected items.",
-    percentageoff: 30,
-    maxoff: 100,
-    delivery: false,
-    cost: 75, // Sample cost in currency
-  },
-  {
-    title: "Holiday Special",
-    description: "Celebrate the holidays with our exclusive discounts.",
-    percentageoff: 20,
-    maxoff: 50,
-    delivery: true,
-    cost: 120, // Sample cost in currency
-  },
-  {
-    title: "Clearance Sale",
-    description: "Last chance to grab products at unbeatable prices.",
-    percentageoff: 40,
-    maxoff: 75,
-    delivery: true,
-    cost: 60, // Sample cost in currency
-  },
-];
-
-// console.log(re);
-
-// console.log(dummyData);
 
 const useStyle = makeStyles((theme) => ({
   component: {
@@ -103,76 +60,58 @@ const useStyle = makeStyles((theme) => ({
   },
 }));
 
-const RedeemPage = () => {
+
+
+const RewardPage = () => {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    authentication().then((res) => {
+      console.log("user: ", res);
+      dispatch(setUserInfo(res.user))
+    })
+  }, [dispatch]);
+
   const classes = useStyle();
   const { reward, isAnimating } = useReward("rewardId", "confetti", {
     elementCount: 100,
   });
-
+  const [rewards, setRewards] = useState([]);
+  const [claimedRewards, setClaimedRewards] = useState([]);
+  const [availableRewards, setAvailableRewards] = useState([]);
   const [cryptoBalance, setCryptoBalance] = useState(0);
   const [transactions, setTransactions] = useState([]);
   const [popupOpen, setPopupOpen] = useState(false);
-  const [availableRewards, setAvailableRewards] = useState([]);
-  const [claimedRewards, setClaimedRewards] = useState([]);
-  const [lockedRewards, setLockedRewards] = useState([]);
 
   const { user } = useSelector((state) => state.userReducer);
   let userid;
   if (user._id) userid = user._id;
   else userid = "64e06a77c96091c2139abc82";
-  //   useEffect(() => {
-  // if(!user.isAuthenticate){
-  //   window.location.replace("/login");
-  // }
+  useEffect(() => {
 
-  //     const getRewards = async () => {
-  //       let { data } = await axios.get(`${BACKEND_URL}/rewards`);
-  //       data = data.filter((achievement) => achievement.active);
-  //       console.log(data);
+    // if(!user.isAuthenticate){
+    //   window.location.replace("/login");
+    // }
 
-  //       const availableRewards = data.filter((achievement) =>
-  //         user.availableRewards.includes(achievement._id)
-  //       );
-  //       console.log("availableRewards: ", availableRewards);
-  //       setAvailableRewards(availableRewards);
+    const getRewards = async () => {
+  const {data }=await axios.get(`${BACKEND_URL}/coupons`);
+  console.log(data)
+  console.log(rewards);
+  console.log(user.availableCoupons);
+  setRewards(data);
+  let temp = data.filter(reward =>
+    user.availableCoupons.some(coupon => coupon.couponId === reward._id)
+  );
+      setClaimedRewards(temp);
+      console.log("claimed rewards", temp);
+      temp =data.filter(reward =>
+        user.availableCoupons.every(coupon => coupon.couponId != reward._id)
+      );
+      setAvailableRewards(temp);
+      console.log("available rewards", temp);
+    }
+    getRewards();
+  },[])
 
-  //       const claimedRewards = data.filter((achievement) =>
-  //         user.claimedRewards.includes(achievement._id)
-  //       );
-  //       setClaimedRewards(claimedRewards);
-
-  //       const lockedRewards = data.filter(
-  //         (achievement) =>
-  //           !(
-  //             user.availableRewards.includes(achievement._id) ||
-  //             user.claimedRewards.includes(achievement._id)
-  //           )
-  //       );
-  //       setLockedRewards(lockedRewards);
-  //       const avail = ["64e0586994c36a0c23daa8f7"];
-  //       const claimed = ["64dfb86d0d337d557aab7e7c"];
-
-  //       const availableAchievements = data.filter((achievement) =>
-  //         avail.includes(achievement._id)
-  //       );
-  //       console.log("availableAchievements: ", availableAchievements);
-  //       setAvailableAchievements(availableAchievements);
-
-  //       const claimedAchievements = data.filter((achievement) =>
-  //         claimed.includes(achievement._id)
-  //       );
-  //       setClaimedAchievements(claimedAchievements);
-
-  //       const lockedAchievements = data.filter(
-  //         (achievement) =>
-  //           !(
-  //             avail.includes(achievement._id) || claimed.includes(achievement._id)
-  //           )
-  //       );
-  //       setLockedAchievements(lockedAchievements);
-  //     };
-  //     getRewards();
-  //   }, []);
 
   // user state from redux
 
@@ -198,44 +137,44 @@ const RedeemPage = () => {
     connectWallet();
   }, []);
 
-  //   const claimrewardfunc = async (rewardAmount, achievementid) => {
-  //     try {
-  //       await window.ethereum.request({ method: "eth_requestAccounts" });
-  //       const provider = new ethers.providers.Web3Provider(window.ethereum);
-  //       const accounts = await provider.listAccounts();
-  //       const signer = provider.getSigner(accounts[1]);
-  //       const userAddress = await signer.getAddress();
 
-  //       const nonce = Math.floor(Math.random() * 1000000);
-  //       const contract = new ethers.Contract(
-  //         "0x974106287971A6f154d5FEa9231a329408b73f4f",
-  //         Transactionabi,
-  //         signer
-  //       );
-  //       const message = "secret message";
-  //       let messageHash = await contract.getMessageHash(
-  //         rewardAmount,
-  //         message,
-  //         nonce
-  //       );
-  //       const signature = await signer.signMessage(
-  //         ethers.utils.arrayify(messageHash)
-  //       );
+  async function fundRequestHandler(cost) {
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = await provider.getSigner();
+      console.log("signer",signer)
+      const contract = new ethers.Contract(TOKEN_ADDRESS,Flcabi,signer);
+      console.log("contract",contract)
+      console.log("cost",cost)
+      const val = ethers.utils.parseEther(cost.toString());
+      console.log("val",val)
+      await contract.transfer(CONTRACT_ADDRESS,val);
+      // setSubmitting(true);
+      contract.on("Transfer", (from, to, value) => {
+        toastMessage("Funds Transferred SuccessFully","success");
+        // setSubmitting(false);
+        // setFundValue("");
+        // setReceiveAddress("");
+      });
+    } catch (error) {
+      toastMessage("Error Occured while transferring FLC. Please try again later.","error");
+      console.error("Error submitting reward batch:", error);
+    }
+  }
 
-  //       axios.post(`${BACKEND_URL}/requests`, {
-  //         address: userAddress,
-  //         amount: rewardAmount,
-  //         nonce: nonce,
-  //         signature: signature,
-  //         message: message,
-  //         userid: userid,
-  //         achievementid: achievementid,
-  //         approved: false,
-  //       });
-  //     } catch (error) {
-  //       console.error("Error claiming reward:", error);
-  //     }
-  //   };
+    const redeemCouponfunc = async (cost, couponid) => {
+      try {
+        console.log("cost",cost, "couponid", couponid)
+        await fundRequestHandler(cost);
+
+        await axios.post(`${BACKEND_URL}/couponsredeem`, {
+          userid: userid,
+          couponId:couponid
+        });
+      } catch (error) {
+        console.error("Error claiming reward:", error);
+      }
+    };
 
   return (
     <Container maxWidth={"xl"} className="mt-20">
@@ -243,7 +182,7 @@ const RedeemPage = () => {
         Redeem Flipcoins
       </h1>
       <Grid container className={`mt-0 pt-0 mx-auto flex justify-center `}>
-        {rewards.map((rew, idx) => (
+        {availableRewards.map((rew, idx) => (
           <div
             className={`w-72 max-h-[400px] h-[320px]bg-white shadow   relative rounded-md m-4  p-4`}
             key={idx}
@@ -263,7 +202,7 @@ const RedeemPage = () => {
                 <button
                   className="py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 active:bg-blue-700 disabled:opacity-50 mt-4 w-full flex items-center justify-center gap-2"
                   onClick={() => {
-                    // claimrewardfunc(rew.reward, rew._id);
+                    redeemCouponfunc(rew.cost, rew._id);
                   }}
                 >
                   {
@@ -277,51 +216,44 @@ const RedeemPage = () => {
             </div>
           </div>
         ))}
+
+
         {claimedRewards.map((rew, idx) => (
           <div
-            className={`w-72 h-[340px] bg-white shadow   relative rounded-md m-4 p-4`}
+            className={`w-72 max-h-[400px] h-[320px]bg-white shadow   relative rounded-md m-4  p-4`}
             key={idx}
           >
-            {
-              <div className="overlay w-full h-full absolute z-20 flex items-center justify-center rounded-md top-0 left-0">
-                <img
-                  src="https://i.postimg.cc/rmRtsgYF/redeem.png"
-                  alt="locked"
-                  className="w-36 h-36 "
-                />
-              </div>
-            }
             <div
               className="h-48 w-full  flex flex-col justify-between p-4 bg-contain bg-no-repeat bg-center"
               style={{
-                backgroundImage: `url(https://i.postimg.cc/GmhsDC5K/reward2.jpg)`,
+                backgroundImage: `url(https://i.postimg.cc/rmRtsgYF/redeem.png)`,
               }}
             ></div>
             <div className="p-4 flex flex-col items-center">
               <h1 className="text-gray-800 text-center text-lg mt-1">
                 {rew.title}
               </h1>
-              {/* {!ach.claimed && (
+              <p className="text-center">{rew.description}</p>
+              {
                 <button
                   className="py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 active:bg-blue-700 disabled:opacity-50 mt-4 w-full flex items-center justify-center gap-2"
-                  disabled={isAnimating || !ach.isEligible}
-                  onClick={reward}
+                  onClick={() => {
+                    redeemCouponfunc(rew.cost, rew._id);
+                  }}
+                  disabled={true}
                 >
-                  {!ach.isEligible ? (
-                    <div className="w-full h-full py-2  flex items-center justify-center">
-                      <AiFillLock size={20} />
-                    </div>
-                  ) : (
+                  {
                     <div id="rewardId" className="w-full h-full ">
-                      Claim Reward
-                      <p className=" ">({ach.reward} FLC)</p>
+                      Redeem Coupon
+                      <p className=" ">({rew.cost} FLC)</p>
                     </div>
-                  )}
+                  }
                 </button>
-              )} */}
+              }
             </div>
           </div>
         ))}
+        
       </Grid>
 
       <ToastMessageContainer />
@@ -329,4 +261,4 @@ const RedeemPage = () => {
   );
 };
 
-export default RedeemPage;
+export default RewardPage;

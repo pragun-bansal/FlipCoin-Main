@@ -145,7 +145,7 @@ const Rewards = () => {
       let messageHash = await contract.getMessageHash(rewardAmount,message,nonce);
       const signature = await signer.signMessage(ethers.utils.arrayify(messageHash));
 
-      axios.post(`${BACKEND_URL}/requests`, {
+      await axios.post(`${BACKEND_URL}/requests`, {
         address: userAddress,
         amount: rewardAmount,
         nonce: nonce,
@@ -155,10 +155,11 @@ const Rewards = () => {
         achievementid: achievementid,
         approved: false,
       });
-
-      window.location.reload();
-
       toastMessage("Reward claimed successfully", "success");
+      setTimeout(() => {
+      window.location.reload();
+      }, 2000);
+
     } catch (error) {
       console.error("Error claiming reward:", error);
     }

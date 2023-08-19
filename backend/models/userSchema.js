@@ -62,7 +62,7 @@ role: {
   enum: ["user", "admin"],
   default: "user",
 },
-  avaiableCoupons: [{
+  availableCoupons: [{
       couponId: {
         type: mongoose.Schema.ObjectId,
         ref: "coupon",
@@ -76,6 +76,7 @@ role: {
       claimed:{
         type: Boolean,
         required: true,
+        default: false,
       }
   }],
   tokens: [
