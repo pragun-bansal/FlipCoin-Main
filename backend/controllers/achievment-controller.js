@@ -1,9 +1,9 @@
-const achievement = require("../models/achievementSchema");
+const Achievement = require("../models/achievementSchema");
 const mongoose = require("mongoose");
 const User = require("../models/userSchema");
 const getachievements = async (req, res) => {
     try {
-        const achievements = await achievement.find();
+        const achievements = await Achievement.find();
         res.json(achievements);
     } catch (error) {
         console.log(error);
@@ -13,7 +13,7 @@ const getachievements = async (req, res) => {
 
 const getachievementById = async (req, res) => {
     try {
-        const achievement = await achievement.findById(req.params.id);
+        const achievement = await Achievement.findById(req.params.id);
         res.json(achievement);
     } catch (error) {
         console.log(error);
@@ -22,14 +22,15 @@ const getachievementById = async (req, res) => {
 }
 
 const createachievement = async (req, res) => {
+    try {
     const achievement = req.body;
     const userId = mongoose.Types.ObjectId(req.body.userId);
     console.log(req.body);
     const user = await User.findById(userId);
     console.log(user);
     if (!user) return res.status(404).send(`No user with id: ${userId}`);
-    const newachievement = new achievement({ ...achievement, claimed: false, active: true });
-    try {
+    const newachievement = new Achievement({ ...achievement, active: true });
+    
         await newachievement.save();
         res.status(201).json(newachievement);
     } catch (error) {
@@ -44,7 +45,7 @@ const updateachievement = async (req, res) => {
         const { title, description, image, identifier, minorderprice, claimed, minorders, active, lastdate, reward } = req.body;
         if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).send(`No achievement with id: ${id}`);
         const updatedachievement = { title, description, image, identifier, minorderprice, claimed, minorders, active, lastdate, reward, _id: id };
-        const achievement = await achievement.findByIdAndUpdate(id, updatedachievement, { new: true });
+        const achievement = await Achievement.findByIdAndUpdate(id, updatedachievement, { new: true });
         res.json(achievement);
     } catch (error) {
         console.log(error);

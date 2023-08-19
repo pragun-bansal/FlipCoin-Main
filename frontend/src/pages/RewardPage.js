@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState} from "react";
 import { useReward } from "react-rewards";
 import {
   makeStyles,
@@ -18,7 +18,7 @@ import { AiFillLock } from "react-icons/ai";
 import axios from "../adapters/axios";
 import { BACKEND_URL } from "../bkd";
 import { useSelector } from "react-redux";
-
+import {useHistory} from "react-router-dom"
 
 // const achievements = [
 //   {
@@ -95,19 +95,46 @@ const Rewards = () => {
   const [cryptoBalance, setCryptoBalance] = useState(0);
   const [transactions, setTransactions] = useState([]);
   const [popupOpen, setPopupOpen] = useState(false);
-  const [achievements, setAchievements] = useState([]);
+  const [availableAchievements, setAvailableAchievements] = useState([]);
+  const [claimedAchievements, setClaimedAchievements] = useState([]);
+  const [lockedAchievements, setLockedAchievements] = useState([]);
 
   const {user} = useSelector((state) => state.userReducer);
   let userid 
   if(user._id) userid = user._id
-  else userid = "64dfa64139cd4372aa5744c3"
-
-
+  else userid = "64e06a77c96091c2139abc82"
   useEffect(() => {
+    // if(!user.isAuthenticate){
+    //   window.location.replace("/login");
+    // }
     const getAchievments = async () => {
-      const { data } = await axios.get(`${BACKEND_URL}/achievements`);
-      console .log(data);
-      setAchievements(data);
+      let { data } = await axios.get(`${BACKEND_URL}/achievements`);
+      data = data.filter((achievement) => achievement.active);
+      console.log(data);
+      
+      // const availableAchievements = data.filter((achievement) => user.availableachievements.includes(achievement._id));
+      // console.log("availableAchievements: ", availableAchievements);
+      // setAvailableAchievements(availableAchievements);
+      
+      // const claimedAchievements = data.filter((achievement) => user.claimedachievements.includes(achievement._id));
+      // setClaimedAchievements(claimedAchievements);
+      
+      // const lockedAchievements = data.filter((achievement) => !(user.availableachievements.includes(achievement._id) || user.claimedachievements.includes(achievement._id)));
+      // setLockedAchievements(lockedAchievements);
+      const avail =["64e0586994c36a0c23daa8f7"]
+      const claimed =["64dfb86d0d337d557aab7e7c"]
+
+      const availableAchievements = data.filter((achievement) => avail.includes(achievement._id));
+      console.log("availableAchievements: ", availableAchievements);
+      setAvailableAchievements(availableAchievements);
+      
+      const claimedAchievements = data.filter((achievement) => claimed.includes(achievement._id));
+      setClaimedAchievements(claimedAchievements);
+      
+      const lockedAchievements = data.filter((achievement) => !(avail.includes(achievement._id) || claimed.includes(achievement._id)));
+      setLockedAchievements(lockedAchievements);
+      
+      
     };
     getAchievments();
   }, []);
@@ -168,7 +195,7 @@ const Rewards = () => {
     }
   };
 
-  const claimrewardfunc = async (rewardAmount) => {
+  const claimrewardfunc = async (rewardAmount,achievementid) => {
     try {
       await window.ethereum.request({ method: "eth_requestAccounts" });
       const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -176,13 +203,14 @@ const Rewards = () => {
       const signer = provider.getSigner(accounts[1]);
       // const signer = provider.getSigner();
       const userAddress = await signer.getAddress();
-      // const rewardAmount = 1; // Replace with the actual reward amount
+      const rewardAmount = 1; // Replace with the actual reward amount
       const nonce = Math.floor(Math.random() * 1000000); // Generate a nonce
      
       const message = ethers.utils.defaultAbiCoder.encode(
         ["address", "uint256", "uint256"],
         [userAddress, rewardAmount, nonce]
       );
+      console.log(message);
 
       console.log("Reward claim signature:", message);
       const messageHash = ethers.utils.keccak256(message);
@@ -206,7 +234,9 @@ const Rewards = () => {
         nonce: nonce,
         signature: signature,
         messageHash: messageHash,
-        userid: userid
+        userid: userid,
+        achievementid:achievementid,
+        approved: false
       })
     } catch (error) {
       console.error("Error claiming reward:", error);
@@ -215,13 +245,92 @@ const Rewards = () => {
 
   return (
     <Container maxWidth={"lg"} className="mx-auto">
+    <h1 className="color-[#2D2D2D] text-4xl font-bold text-center mt-8 mb-8">Available Rewards</h1>
       <Grid container className={classes.component}>
-        {achievements.map((ach, idx) => (
+        {availableAchievements.map((ach, idx) => (
           <div
             className={`w-72 h-[340px] bg-white shadow   relative rounded-md m-4 p-4`}
             key={idx}
           >
-            {ach.claimed && (
+            {/* {(
+              <div className="overlay w-full h-full absolute z-20 flex items-center justify-center rounded-md top-0 left-0">
+                <img
+                  src="https://i.postimg.cc/Fsn0tQQ7/claimed.png"
+                  alt="locked"
+                  className="w-36 h-36 "
+                />
+              </div>
+            )} */}
+            <div
+              className="h-48 w-full  flex flex-col justify-between p-4 bg-contain bg-no-repeat bg-center"
+              style={{
+                backgroundImage: `url(https://i.postimg.cc/GmhsDC5K/reward2.jpg)`,
+              }}
+            ></div>
+            <div className="p-4 flex flex-col items-center">
+              <h1 className="text-gray-800 text-center text-lg mt-1">
+                {ach.title}
+              </h1>
+              {(
+                <button
+                  className="py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 active:bg-blue-700 disabled:opacity-50 mt-4 w-full flex items-center justify-center gap-2"
+                  disabled={isAnimating}
+                  onClick={()=>{reward();claimrewardfunc(0,ach._id)}}
+                >
+                  {(
+                    <div id="rewardId" className="w-full h-full ">
+                      Claim Reward
+                      <p className=" ">({ach.reward} FLC)</p>
+                    </div>
+                  )}
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
+      </Grid>
+      <h1 className="color-[#2D2D2D] text-4xl font-bold text-center mt-8 mb-8">Locked Rewards</h1>
+      <Grid container className={classes.component}>
+        {lockedAchievements.map((ach, idx) => (
+          <div
+            className={`w-72 h-[340px] bg-white shadow   relative rounded-md m-4 p-4`}
+            key={idx}
+          >
+            <div
+              className="h-48 w-full  flex flex-col justify-between p-4 bg-contain bg-no-repeat bg-center"
+              style={{
+                backgroundImage: `url(https://i.postimg.cc/GmhsDC5K/reward2.jpg)`,
+              }}
+            ></div>
+            <div className="p-4 flex flex-col items-center">
+              <h1 className="text-gray-800 text-center text-lg mt-1">
+                {ach.title}
+              </h1>
+              {(
+                <button
+                  className="py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 active:bg-blue-700 disabled:opacity-50 mt-4 w-full flex items-center justify-center gap-2"
+                  disabled={isAnimating || !ach.isEligible}
+                  // onClick={reward}
+                >
+                  {(
+                    <div className="w-full h-full py-2  flex items-center justify-center">
+                      <AiFillLock size={20} />
+                    </div>
+                  )}
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
+      </Grid>
+      <h1 className="color-[#2D2D2D] text-4xl font-bold text-center mt-8 mb-8">Claimed Rewards</h1>
+      <Grid container className={classes.component}>
+        {claimedAchievements.map((ach, idx) => (
+          <div
+            className={`w-72 h-[340px] bg-white shadow   relative rounded-md m-4 p-4`}
+            key={idx}
+          >
+            {(
               <div className="overlay w-full h-full absolute z-20 flex items-center justify-center rounded-md top-0 left-0">
                 <img
                   src="https://i.postimg.cc/Fsn0tQQ7/claimed.png"
@@ -240,7 +349,7 @@ const Rewards = () => {
               <h1 className="text-gray-800 text-center text-lg mt-1">
                 {ach.title}
               </h1>
-              {!ach.claimed && (
+              {/* {!ach.claimed && (
                 <button
                   className="py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 active:bg-blue-700 disabled:opacity-50 mt-4 w-full flex items-center justify-center gap-2"
                   disabled={isAnimating || !ach.isEligible}
@@ -257,7 +366,7 @@ const Rewards = () => {
                     </div>
                   )}
                 </button>
-              )}
+              )} */}
             </div>
           </div>
         ))}
@@ -268,7 +377,7 @@ const Rewards = () => {
         </Box>
         <Button onClick={() => setPopupOpen(true)}>Show Transactions</Button>
 
-        <Button onClick={claimrewardfunc}>Claim Reward</Button>
+        {/* <Button onClick={()=>{claimrewardfunc(0,0)}}>Claim Reward</Button> */}
       </Grid>
       <Dialog open={popupOpen} onClose={() => setPopupOpen(false)}>
         <DialogTitle>Latest Transactions</DialogTitle>
