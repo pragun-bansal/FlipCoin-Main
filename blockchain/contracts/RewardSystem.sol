@@ -22,7 +22,7 @@ contract RewardSystem {
         uint256 rewardAmount;
         uint256 nonce;
         bytes signature;
-        bytes32 messagehash;
+        string messagehash;
     }
 
 
@@ -46,57 +46,63 @@ contract RewardSystem {
         achievements.push(new Achievement(title, desc, reward));
     }
 
-    // function addToBalance(address user, uint256 amount) external onlyOwner {
-    //     userBalances[user] += amount;
-    // }
-    function splitSignature(bytes memory sig) public pure returns (bytes32 r, bytes32 s, uint8 v) {
+     function getMessageHash(uint _amount,string memory _message,uint _nonce) public pure returns (bytes32) {
+        return keccak256(abi.encodePacked(_amount, _message, _nonce));
+    }
+
+    function getEthSignedMessageHash( bytes32 _messageHash) public pure returns (bytes32) {
+        return keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", _messageHash));
+    }
+    
+
+    
+    function recoverSigner(bytes32 _ethSignedMessageHash,bytes memory _signature) public pure returns (address) {
+        (bytes32 r, bytes32 s, uint8 v) = splitSignature(_signature);
+        return ecrecover(_ethSignedMessageHash, v, r, s);
+    }
+
+    function splitSignature( bytes memory sig) public pure returns (bytes32 r, bytes32 s, uint8 v) {
         require(sig.length == 65, "invalid signature length");
 
         assembly {
-            /*
-            First 32 bytes stores the length of the signature
-
-            add(sig, 32) = pointer of sig + 32
-            effectively, skips first 32 bytes of signature
-
-            mload(p) loads next 32 bytes starting at the memory address p into memory
-            */
-
-            // first 32 bytes, after the length prefix
             r := mload(add(sig, 32))
-            // second 32 bytes
             s := mload(add(sig, 64))
-            // final byte (first byte of the next 32 bytes)
             v := byte(0, mload(add(sig, 96)))
         }
-
-        // implicitly return (r, s, v)
     }
 
-
-    function verifySignature(address signer,bytes32 messageHash,bytes memory signature) internal pure returns (bool) {
-        bytes32 ethSignedMessageHash = keccak256( abi.encodePacked("\x19Ethereum Signed Message:\n32", messageHash));
-        (bytes32 r, bytes32 s, uint8 v) = splitSignature(signature);
-        return ecrecover(ethSignedMessageHash, v, r, s) == signer;
+    function verify(address _signer,uint _amount,string memory _message,uint _nonce,bytes memory signature) public pure returns (bool) {
+        bytes32 messageHash = getMessageHash( _amount, _message, _nonce);
+        bytes32 ethSignedMessageHash = getEthSignedMessageHash(messageHash);
+        return recoverSigner(ethSignedMessageHash, signature) == _signer;
     }
 
-    function claimReward(address user,uint256 rewardAmount,uint256 nonce,bytes memory signature,bytes32 messagehash) public{
+    // function claimReward(address user,uint rewardAmount,uint nonce,bytes memory signature,string memory message) public{
+    //     require(user != address(0), "Invalid user address");
+    //     require(rewardAmount > 0, "Reward amount must be greater than 0");
+    //     // bytes32 messageHash = getMessageHash( rewardAmount, message, nonce);
+    //     // bytes32 ethSignedMessageHash = getEthSignedMessageHash(messageHash);
+    //     // require( recoverSigner(ethSignedMessageHash, signature) == user,"Invalid signature");
+
+    //     // if(!verify(user,rewardAmount,message,nonce, signature)) return;
+
+    //     // require(verify(user,rewardAmount,message,nonce, signature), "Invalid signature");
+    //     // userBalances[user] += rewardAmount;
+    //     // Transfer FLC tokens from contract to user
+
+    //     flcToken.transfer(user, rewardAmount); // Transfer tokens from contract to user
+    //     emit RewardClaimed(user, rewardAmount, nonce);
+    //     emit RewardCredited(user, rewardAmount);
+    // }
+
+    function claimReward(address user,uint256 rewardAmount,uint256 nonce,bytes memory signature,string memory message) public{
         require(user != address(0), "Invalid user address");
         require(rewardAmount > 0, "Reward amount must be greater than 0");
         
-
-
-        bytes32 messageHash = keccak256(
-            abi.encodePacked(user, rewardAmount,messagehash ,nonce)
-        );
-
-        // require(
-        //     verifySignature(user, messageHash, signature),
-        //     "Invalid signature"
-        // );
-
-        // userBalances[user] += rewardAmount;
-        // Transfer FLC tokens from contract to user
+        
+        bytes32 messageHash = getMessageHash( rewardAmount, message, nonce);
+        bytes32 ethSignedMessageHash = getEthSignedMessageHash(messageHash);
+        require( recoverSigner(ethSignedMessageHash, signature) == user,"Invalid signature");
 
         flcToken.transfer(user, rewardAmount); // Transfer tokens from contract to user
         emit RewardClaimed(user, rewardAmount, nonce);
@@ -104,14 +110,11 @@ contract RewardSystem {
     }
 
 
-    // add function for handling batch transactions
-    function handleBatch(RewardClaims[] memory rewardClaims) public {
+    function handleBatch(RewardClaims[] memory rewardClaims) public onlyOwner{
         for(uint256 i=0;i<rewardClaims.length;i++){
             claimReward(rewardClaims[i].user,rewardClaims[i].rewardAmount,rewardClaims[i].nonce,rewardClaims[i].signature,rewardClaims[i].messagehash);
         }
     }
-
-  
 
     event RewardClaimed(
         address indexed user,
@@ -119,14 +122,7 @@ contract RewardSystem {
         uint256 nonce
     );
 
-    function allow(address cntr,uint256 amount) public payable{
-
-    }
-
     function fund(uint val,address reciver) public payable onlyOwner{
-        // require(flcToken.approve(address(this), val+100),"Not allowed");
-        // require(flcToken.allowance(address(this),0xa421D70fc0a3eda6fbaE1C0C94c93E54ac1Dcd15) >= val, "Insufficient allowance");
-        // flcToken.transferFrom(address(this),0xa421D70fc0a3eda6fbaE1C0C94c93E54ac1Dcd15,val);
         flcToken.transfer(reciver,val);
     }
 
@@ -136,13 +132,7 @@ contract RewardSystem {
         return k;
     }
 
-    // fallback() external payable {
-    //     fund();
-    // }
 
-    // receive() external payable {
-    //     fund();
-    // }
 
     event RewardCredited(address indexed user, uint256 rewardAmount);
 }
