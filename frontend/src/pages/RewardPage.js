@@ -1,4 +1,4 @@
-import React, { useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import { useReward } from "react-rewards";
 import {
   makeStyles,
@@ -18,7 +18,7 @@ import { AiFillLock } from "react-icons/ai";
 import axios from "../adapters/axios";
 import { BACKEND_URL } from "../bkd";
 import { useSelector } from "react-redux";
-import {useHistory} from "react-router-dom"
+import { useHistory } from "react-router-dom";
 import Transactionabi from "../utils/transactionsabi.json";
 
 // const achievements = [
@@ -50,7 +50,6 @@ import Transactionabi from "../utils/transactionsabi.json";
 //     claimed: true,
 //   },
 // ];
-
 
 const useStyle = makeStyles((theme) => ({
   component: {
@@ -100,10 +99,10 @@ const Rewards = () => {
   const [claimedAchievements, setClaimedAchievements] = useState([]);
   const [lockedAchievements, setLockedAchievements] = useState([]);
 
-  const {user} = useSelector((state) => state.userReducer);
-  let userid 
-  if(user._id) userid = user._id
-  else userid = "64e06a77c96091c2139abc82"
+  const { user } = useSelector((state) => state.userReducer);
+  let userid;
+  if (user._id) userid = user._id;
+  else userid = "64e06a77c96091c2139abc82";
   useEffect(() => {
     // if(!user.isAuthenticate){
     //   window.location.replace("/login");
@@ -112,37 +111,42 @@ const Rewards = () => {
       let { data } = await axios.get(`${BACKEND_URL}/achievements`);
       data = data.filter((achievement) => achievement.active);
       console.log(data);
-      
+
       // const availableAchievements = data.filter((achievement) => user.availableachievements.includes(achievement._id));
       // console.log("availableAchievements: ", availableAchievements);
       // setAvailableAchievements(availableAchievements);
-      
+
       // const claimedAchievements = data.filter((achievement) => user.claimedachievements.includes(achievement._id));
       // setClaimedAchievements(claimedAchievements);
-      
+
       // const lockedAchievements = data.filter((achievement) => !(user.availableachievements.includes(achievement._id) || user.claimedachievements.includes(achievement._id)));
       // setLockedAchievements(lockedAchievements);
-      const avail =["64e0586994c36a0c23daa8f7"]
-      const claimed =["64dfb86d0d337d557aab7e7c"]
+      const avail = ["64e0586994c36a0c23daa8f7"];
+      const claimed = ["64dfb86d0d337d557aab7e7c"];
 
-      const availableAchievements = data.filter((achievement) => avail.includes(achievement._id));
+      const availableAchievements = data.filter((achievement) =>
+        avail.includes(achievement._id)
+      );
       console.log("availableAchievements: ", availableAchievements);
       setAvailableAchievements(availableAchievements);
-      
-      const claimedAchievements = data.filter((achievement) => claimed.includes(achievement._id));
+
+      const claimedAchievements = data.filter((achievement) =>
+        claimed.includes(achievement._id)
+      );
       setClaimedAchievements(claimedAchievements);
-      
-      const lockedAchievements = data.filter((achievement) => !(avail.includes(achievement._id) || claimed.includes(achievement._id)));
+
+      const lockedAchievements = data.filter(
+        (achievement) =>
+          !(
+            avail.includes(achievement._id) || claimed.includes(achievement._id)
+          )
+      );
       setLockedAchievements(lockedAchievements);
-      
-      
     };
     getAchievments();
   }, []);
 
-
   // user state from redux
-
 
   const connectWallet = async () => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -166,8 +170,7 @@ const Rewards = () => {
     connectWallet();
   }, []);
 
-
-  const claimrewardfunc = async (rewardAmount,achievementid) => {
+  const claimrewardfunc = async (rewardAmount, achievementid) => {
     try {
       await window.ethereum.request({ method: "eth_requestAccounts" });
       const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -175,24 +178,32 @@ const Rewards = () => {
       const signer = provider.getSigner(accounts[1]);
       const userAddress = await signer.getAddress();
 
-      const nonce = Math.floor(Math.random() * 1000000); 
-      const contract = new ethers.Contract('0x974106287971A6f154d5FEa9231a329408b73f4f',Transactionabi,signer)
+      const nonce = Math.floor(Math.random() * 1000000);
+      const contract = new ethers.Contract(
+        "0x974106287971A6f154d5FEa9231a329408b73f4f",
+        Transactionabi,
+        signer
+      );
       const message = "secret message";
-      let messageHash = await contract.getMessageHash(rewardAmount,message , nonce);
-      const signature = await signer.signMessage( ethers.utils.arrayify(messageHash) );
+      let messageHash = await contract.getMessageHash(
+        rewardAmount,
+        message,
+        nonce
+      );
+      const signature = await signer.signMessage(
+        ethers.utils.arrayify(messageHash)
+      );
 
-  
-      axios.post(`${BACKEND_URL}/requests`,{
+      axios.post(`${BACKEND_URL}/requests`, {
         address: userAddress,
         amount: rewardAmount,
         nonce: nonce,
         signature: signature,
         message: message,
         userid: userid,
-        achievementid:achievementid,
-        approved: false
-      })
-
+        achievementid: achievementid,
+        approved: false,
+      });
     } catch (error) {
       console.error("Error claiming reward:", error);
     }
@@ -200,22 +211,12 @@ const Rewards = () => {
 
   return (
     <Container maxWidth={"lg"} className="mx-auto">
-    <h1 className="color-[#2D2D2D] text-4xl font-bold text-center mt-8 mb-8">Available Rewards</h1>
       <Grid container className={classes.component}>
         {availableAchievements.map((ach, idx) => (
           <div
             className={`w-72 h-[340px] bg-white shadow   relative rounded-md m-4 p-4`}
             key={idx}
           >
-            {/* {(
-              <div className="overlay w-full h-full absolute z-20 flex items-center justify-center rounded-md top-0 left-0">
-                <img
-                  src="https://i.postimg.cc/Fsn0tQQ7/claimed.png"
-                  alt="locked"
-                  className="w-36 h-36 "
-                />
-              </div>
-            )} */}
             <div
               className="h-48 w-full  flex flex-col justify-between p-4 bg-contain bg-no-repeat bg-center"
               style={{
@@ -226,26 +227,26 @@ const Rewards = () => {
               <h1 className="text-gray-800 text-center text-lg mt-1">
                 {ach.title}
               </h1>
-              {(
+              {
                 <button
                   className="py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 active:bg-blue-700 disabled:opacity-50 mt-4 w-full flex items-center justify-center gap-2"
                   disabled={isAnimating}
-                  onClick={()=>{reward();claimrewardfunc(ach.reward,ach._id)}}
+                  onClick={() => {
+                    reward();
+                    claimrewardfunc(ach.reward, ach._id);
+                  }}
                 >
-                  {(
+                  {
                     <div id="rewardId" className="w-full h-full ">
                       Claim Reward
                       <p className=" ">({ach.reward} FLC)</p>
                     </div>
-                  )}
+                  }
                 </button>
-              )}
+              }
             </div>
           </div>
         ))}
-      </Grid>
-      <h1 className="color-[#2D2D2D] text-4xl font-bold text-center mt-8 mb-8">Locked Rewards</h1>
-      <Grid container className={classes.component}>
         {lockedAchievements.map((ach, idx) => (
           <div
             className={`w-72 h-[340px] bg-white shadow   relative rounded-md m-4 p-4`}
@@ -261,31 +262,28 @@ const Rewards = () => {
               <h1 className="text-gray-800 text-center text-lg mt-1">
                 {ach.title}
               </h1>
-              {(
+              {
                 <button
                   className="py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 active:bg-blue-700 disabled:opacity-50 mt-4 w-full flex items-center justify-center gap-2"
                   disabled={isAnimating || !ach.isEligible}
                   // onClick={reward}
                 >
-                  {(
+                  {
                     <div className="w-full h-full py-2  flex items-center justify-center">
                       <AiFillLock size={20} />
                     </div>
-                  )}
+                  }
                 </button>
-              )}
+              }
             </div>
           </div>
         ))}
-      </Grid>
-      <h1 className="color-[#2D2D2D] text-4xl font-bold text-center mt-8 mb-8">Claimed Rewards</h1>
-      <Grid container className={classes.component}>
         {claimedAchievements.map((ach, idx) => (
           <div
             className={`w-72 h-[340px] bg-white shadow   relative rounded-md m-4 p-4`}
             key={idx}
           >
-            {(
+            {
               <div className="overlay w-full h-full absolute z-20 flex items-center justify-center rounded-md top-0 left-0">
                 <img
                   src="https://i.postimg.cc/Fsn0tQQ7/claimed.png"
@@ -293,7 +291,7 @@ const Rewards = () => {
                   className="w-36 h-36 "
                 />
               </div>
-            )}
+            }
             <div
               className="h-48 w-full  flex flex-col justify-between p-4 bg-contain bg-no-repeat bg-center"
               style={{

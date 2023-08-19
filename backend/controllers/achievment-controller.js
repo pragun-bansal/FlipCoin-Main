@@ -57,7 +57,6 @@ const redeemachievement = async (req, res) => {
     try {
         const user = await User.findById(req.body.userId);
         if (!user) return res.status(400).json({message: `No user with id: ${req.body.userId}`});
-        
         user.availableachievements = user.availableachievements.filter((achievement) => achievement.achievementid != req.body.achievementid);
         user.claimedachievements.push({achievementid:req.body.achievementid,claimDate:Date.now()});
         await user.save();

@@ -39,12 +39,11 @@ const approveRequest = async (req, res) => {
 const approveBatchRequests = async (req, res) => {
     try {
         const inputarr = req.body.inputs;
-       
         inputarr.forEach(async (input) => {
             const user = await User.findById(input.userid);
             if (!user) return res.status(400).send(`No user with id: ${input.userid}`);
-            const request = await Requests.findById(input.reqid);
-            if (!request) return res.status(400).send(`No request with id: ${input.reqid}`);
+            const request = await Requests.findById(input._id);
+            if (!request) return res.status(400).send(`No request with id: ${input._id}`);
             request.approved = true;
             await request.save();
         });

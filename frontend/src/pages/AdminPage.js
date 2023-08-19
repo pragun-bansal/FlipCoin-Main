@@ -86,6 +86,8 @@ const AdminPage = () => {
   
   const [requests, setRequests] = useState([]);
 
+  const [showApproved, setShowApproved] = useState(false);
+
   const {user} = useSelector((state) => state.userReducer);
   let userid 
   if(user._id) userid = user._id
@@ -133,7 +135,7 @@ const AdminPage = () => {
   });
 
   const rewardClaims = [];
-  rewardClaimsArray.forEach((req) => {
+  rewardClaimsArray.filter((req)=>req.approved==false).forEach((req) => {
     rewardClaims.push([req.address, req.amount,  req.nonce, req.signature, req.message]);
   });
 
@@ -141,14 +143,17 @@ const AdminPage = () => {
 
   async function submitRewardBatch() {
     try {
+      console.log(window.ethereum);
         await window.ethereum.request({ method: "eth_requestAccounts" });
         const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const privateKey = "749fd5aaae691acca5d7ad99db3ef39065a2fa3c4ea51c22af2c48536746c111"; 
+        const privateKey = "46dd819018d9fb9190ba4fee325243ce1cef146d06ef6df5ac7468adeba78fda"; 
         const sender = new ethers.Wallet(privateKey, provider);
-        const contractAddress = "0x4Ed91AebEEa5857204d8f073aCAD9Dbbb0B57d8e";
+        const contractAddress = "0xBF548039835B7850FdF5B76B1233FDD59D36c322";
         const contract = new ethers.Contract(contractAddress,Transactionabi, sender);
         console.log("rewardClaims ",rewardClaims[0]);
         await contract.handleBatch(rewardClaims);
+        const approve = axios.post(`${BACKEND_URL}/requests/approveBatch`, requests.filter((req)=>req.approved==false));
+
     } catch (error) {
       console.error("Error submitting reward batch:", error);
     }
@@ -212,8 +217,8 @@ const AdminPage = () => {
 
     <Grid container className={classes.component}>
       <div className={classes.leftSection}>
-        <DataGrid
-          rows={rewardClaimsArray}
+       {!showApproved ?<DataGrid
+          rows={rewardClaimsArray.filter((req) => req.approved === false)}
           columns={columns}
           initialState={{
             pagination: {
@@ -224,6 +229,19 @@ const AdminPage = () => {
           disableRowSelectionOnClick
           className={"bg-white rounded-xl shadow-xl border-2 border-gray-200"}
         />
+        :<DataGrid
+          rows={rewardClaimsArray.filter((req) => req.approved === true)}
+          columns={columns}
+          initialState={{
+            pagination: {
+              paginationModel: { page: 0, pageSize: 5 },
+            }, 
+          }}
+          pageSizeOptions={[5,10,15]}
+          disableRowSelectionOnClick
+          className={"bg-white rounded-xl shadow-xl border-2 border-gray-200"}
+        />
+        }
         <br />
       </div>
       <div className={classes.rightSection}>
@@ -262,6 +280,13 @@ const AdminPage = () => {
             Create New Achievment
           </Button>
         </div>
+
+        <div className="w-full flex flex-row items-center">
+          <Button variant="contained" color="primary" onClick={()=>setShowApproved(!showApproved)} className="!mx-auto !my-6 !text-md !px-2 !py-4" >
+            {showApproved ? "Show Pending" : "Show Approved"}
+          </Button>
+        </div>
+        
 
 
       </div>
