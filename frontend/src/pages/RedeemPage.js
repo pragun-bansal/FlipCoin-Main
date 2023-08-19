@@ -117,6 +117,7 @@ const RewardPage = () => {
 
   const connectWallet = async () => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
     const privateKey =
       "8d1444ef95f13c8d0713e4319463d8d24316940a21a9624b81978d84c6c616f3"; // Admin's private key
     const sender = new ethers.Wallet(privateKey, provider);
@@ -141,6 +142,7 @@ const RewardPage = () => {
   async function fundRequestHandler(cost) {
     try {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
       const signer = await provider.getSigner();
       console.log("signer",signer)
       const contract = new ethers.Contract(TOKEN_ADDRESS,Flcabi,signer);

@@ -169,6 +169,7 @@ const AdminPage = () => {
         }
         await window.ethereum.request({ method: "eth_requestAccounts" });
         const provider = new ethers.providers.Web3Provider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
         const sender = new ethers.Wallet(ADMIN_PVT_KEY, provider);
         const contract = new ethers.Contract(CONTRACT_ADDRESS,Transactionabi, sender);
         await contract.handleBatch(rewardClaims);
@@ -207,6 +208,7 @@ const AdminPage = () => {
   async function fundRequestHandler() {
     try {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
       const signer = await provider.getSigner();
       const contract = new ethers.Contract(TOKEN_ADDRESS,Flcabi,signer);
       const val = ethers.utils.parseEther(fundValue);

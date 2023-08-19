@@ -119,6 +119,7 @@ const Rewards = () => {
 
   const connectWallet = async () => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
     const sender = new ethers.Wallet(ADMIN_PVT_KEY, provider);
     const signer = provider.getSigner();
     const contract = new ethers.Contract(TOKEN_ADDRESS, Flcabi,sender);
@@ -135,6 +136,7 @@ const Rewards = () => {
     try {
       await window.ethereum.request({ method: "eth_requestAccounts" });
       const provider = new ethers.providers.Web3Provider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
       const accounts = await provider.listAccounts();
       const signer = provider.getSigner(accounts[0]);
       const userAddress = await signer.getAddress();
