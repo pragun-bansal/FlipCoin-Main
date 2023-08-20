@@ -12,8 +12,6 @@ const completeOrder = async (req, res) => {
     user.totalOrders++;
     user.totalAmount += order.totalAmount;
     
-    // // Appending all unlocked achivemtn to user available achievements
-    // appneding all avaiabe and claimed achivmets to set
     const achivids = new Set();
     user.availableachievements.forEach((achievement) => {
       achivids.add(achievement.achievementId);
@@ -24,11 +22,8 @@ const completeOrder = async (req, res) => {
     
 
     const achievements = await Achievment.find({});
-
     const useravailableachievementsids = user.availableachievements.map((achievement) => achievement.achievementId.toString()); 
     const userclaimedachievementsids = user.claimedachievements.map((achievement) => achievement.achievementId.toString());
-    console.log(useravailableachievementsids);
-    console.log(userclaimedachievementsids);
     const newachievements = [];
     achievements.forEach((achievement) => {
       if (achievement.minorders <= user.totalOrders && achievement.minorderprice <= user.totalAmount) {
@@ -38,6 +33,14 @@ const completeOrder = async (req, res) => {
     });
     console.log(newachievements);
     user.availableachievements = user.availableachievements.concat(newachievements);
+    if(req.body.couponid){
+      user.availableCoupons = user.availableCoupons.map((coupon) => {
+        if(coupon.couponId.toString() === req.body.couponid.toString()){
+          coupon.claimed = true;
+        }
+        return coupon;
+      });
+    }
     await user.save();
   
     //     user.availableachievements.push({

@@ -15,8 +15,6 @@ import { setUserInfo } from "../../actions/userActions";
 import axios from "axios";
 
 
-
-
 const useStyle = makeStyles({
   header: {
     padding: "15px 24px",
@@ -44,152 +42,23 @@ const useStyle = makeStyles({
 });
 
 const TotalView = ({ page = "cart" }) => {
-  // const [user, setUser] = useState({});
   const dispatch = useDispatch();
   useEffect(() => {
     authentication().then((res) => {
-      console.log("user: ", res);
       dispatch(setUserInfo(res.user))
     })
   }, [dispatch]);
   const classes = useStyle();
   const [price, setPrice] = useState(0);
   const [discount, setDiscount] = useState(0);
-  const [deliveryCharges, setDeliveryCharges] = useState(50);
-  const { cartItems, stateChangeNotifyCounter } = useSelector(
-    (state) => state.cartReducer
-  );
-
+  const [deliveryCharges, setDeliveryCharges] = useState(0);
+  const { cartItems, stateChangeNotifyCounter } = useSelector((state) => state.cartReducer);
+  const [rewards,setRewards] = useState([]);
+  const [availableRewards,setAvailableRewards] = useState([]);
+  const [coupon, setCoupon] = useState("None");
   const { user } = useSelector((state) => state.userReducer);
-  console.log(user)
 
-  // const user = {
-  //   "_id": {
-  //     "$oid": "64e06a77c96091c2139abc82"
-  //   },
-  //   "fname": "Pragun",
-  //   "lname": "Bansal",
-  //   "password": "$2a$12$7l12zDb6S2BMlpr8w2gdBO.QyS6l7wSPunuIU7Rpqib09AsF2STt6",
-  //   "phone": 9811144328,
-  //   "role": "admin",
-  //   "totalOrders": 4,
-  //   "totalAmount": 166486,
-  //   "claimedachievements": [
-  //     {
-  //       "achievementId": {
-  //         "$oid": "64e0ccfb85b8439299b785dd"
-  //       },
-  //       "claimedDate": {
-  //         "$date": "2023-08-19T15:00:13.870Z"
-  //       },
-  //       "_id": {
-  //         "$oid": "64e0dbd6b006ffbeae437d2a"
-  //       }
-  //     },
-  //     {
-  //       "achievementId": {
-  //         "$oid": "64e0d2cf58d65abfae0564a1"
-  //       },
-  //       "claimedDate": {
-  //         "$date": "2023-08-19T15:00:13.870Z"
-  //       },
-  //       "_id": {
-  //         "$oid": "64e0dc18b006ffbeae437d79"
-  //       }
-  //     },
-  //     {
-  //       "achievementId": {
-  //         "$oid": "64e0cfce3180bd12b0734131"
-  //       },
-  //       "claimedDate": {
-  //         "$date": "2023-08-19T16:21:55.233Z"
-  //       },
-  //       "_id": {
-  //         "$oid": "64e0f002532e2ae6e8692a42"
-  //       }
-  //     },
-  //     {
-  //       "achievementId": {
-  //         "$oid": "64e0d137a1da333ed344579b"
-  //       },
-  //       "claimedDate": {
-  //         "$date": "2023-08-19T16:21:55.233Z"
-  //       },
-  //       "_id": {
-  //         "$oid": "64e0f044532e2ae6e8692a9d"
-  //       }
-  //     }
-  //   ],
-  //   "availableachievements": [],
-  //   "tokens": [
-  //     {
-  //       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGUwNmE3N2M5NjA5MWMyMTM5YWJjODIiLCJpYXQiOjE2OTI0Mjg5MTl9.RYkgyvBDK4wNbfDSm6ertJ0Qlvl3basVHj1RDWTO7TE",
-  //       "_id": {
-  //         "$oid": "64e06a77c96091c2139abc83"
-  //       }
-  //     },
-  //     {
-  //       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGUwNmE3N2M5NjA5MWMyMTM5YWJjODIiLCJpYXQiOjE2OTI0Mjg5Mjh9.cobu-zcDxMfwMVMQy1TlfrMSglsHJGJGOa6npHxF2s4",
-  //       "_id": {
-  //         "$oid": "64e06a80c96091c2139abc8a"
-  //       }
-  //     },
-  //     {
-  //       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGUwNmE3N2M5NjA5MWMyMTM5YWJjODIiLCJpYXQiOjE2OTI0Mjg5NjJ9.AHdOMfyGt5V4FgviJ-zwfiLmtIKCYXujKDyp_dg-4TI",
-  //       "_id": {
-  //         "$oid": "64e06aa2c96091c2139abc92"
-  //       }
-  //     },
-  //     {
-  //       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGUwNmE3N2M5NjA5MWMyMTM5YWJjODIiLCJpYXQiOjE2OTI0Mjg5ODR9.MgeSUrclsSiVIycUEuAe5PgGU6WviZ05d_1u5OWmB80",
-  //       "_id": {
-  //         "$oid": "64e06ab8c96091c2139abc9c"
-  //       }
-  //     },
-  //     {
-  //       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGUwNmE3N2M5NjA5MWMyMTM5YWJjODIiLCJpYXQiOjE2OTI0MjkwNzV9.z1_FoQwIhRxt7ETDLDWft6qi17f6OlfaeCLRNhmcyys",
-  //       "_id": {
-  //         "$oid": "64e06b13c96091c2139abca8"
-  //       }
-  //     },
-  //     {
-  //       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGUwNmE3N2M5NjA5MWMyMTM5YWJjODIiLCJpYXQiOjE2OTI0ODA3MTd9.r7AT_O8cIkndNI4BiQ2uFKupuz8JcMoMNPHa7cbEV8Y",
-  //       "_id": {
-  //         "$oid": "64e134cd161ab31aacbd0a35"
-  //       }
-  //     }
-  //   ],
-  //   "__v": 30,
-  //   "availableCoupons": [
-  //     {
-  //       "couponId": {
-  //         "$oid": "64e0ee1f532e2ae6e8692a07"
-  //       },
-  //       "lastDate": {
-  //         "$date": "2023-08-29T17:45:14.425Z"
-  //       },
-  //       "claimed": false,
-  //       "_id": {
-  //         "$oid": "64e0ffaaf60f870f15250955"
-  //       }
-  //     },
-  //     {
-  //       "couponId": {
-  //         "$oid": "64e0fdac532e2ae6e8692b7d"
-  //       },
-  //       "lastDate": {
-  //         "$date": "2023-08-29T18:19:54.422Z"
-  //       },
-  //       "claimed": false,
-  //       "_id": {
-  //         "$oid": "64e107ca161ab31aacbd0855"
-  //       }
-  //     }
-  //   ]
-  // }
 
-const [rewards,setRewards] = useState([]);
-const [availableRewards,setAvailableRewards] = useState([]);
   useEffect(() => {
 
     // if(!user.isAuthenticate){
@@ -197,61 +66,81 @@ const [availableRewards,setAvailableRewards] = useState([]);
     // }
 
     const getRewards = async () => {
-  const {data }=await axios.get(`${BACKEND_URL}/coupons`);
-  console.log(data)
-  console.log(rewards);
-  console.log(user.availableCoupons);
-  setRewards(data);
-  let temp = data.filter(reward =>
-    user.availableCoupons.some(coupon => coupon.couponId === reward._id)
-  );
-  setAvailableRewards(temp);
-  
-      console.log("available rewards", temp);
-    }
-    getRewards();
-  },[])
+        const {data }=await axios.get(`${BACKEND_URL}/coupons`);
+        console.log(data)
+        console.log(rewards);
+        console.log(user.availableCoupons);
+        setRewards(data);
+        let temp = data.filter(reward =>
+          user.availableCoupons.some(tmp => tmp.couponId === reward._id)
+        );
+        setAvailableRewards(temp);     
+      }
+      getRewards();
+    },[])
 
-  const [coupon, setCoupon] = useState();
 
   const handleCouponChange = (event) => {
-    setCoupon(event.target.value);
-    console.log(event.target.value);
-  };
+    console.log("event hai", event.target.value);
+    let tmpcoupon = availableRewards.find(tmp => tmp.title === event.target.value);
+    // let tmpcoupon = event.target.value;
+    if(tmpcoupon === undefined){
+      tmpcoupon = {title:"None",description:"",percentageoff: 0,maxoff: 0, delievery:false,cost:0}
+    }
+
+    setCoupon(tmpcoupon.title);
 
 
-  useEffect(() => {
-    totalAmount();
-  }, [cartItems, stateChangeNotifyCounter]);
-
-  const totalAmount = () => {
-    let price = 0,
-      discount = 0;
-    cartItems.map((item) => {
+    // const parsedObject = event.target.value;
+    // setCoupon(prevCoupon => ({...prevCoupon,_id:parsedObject._id, }));
+    // console.log("coupon hai", coupon,{...parsedObject});
+    let price = 0;
+    let discount_bubble = 0;
+    console.log("coupon hai", coupon);
+    console.log("price hai and discount hai abhi", price, discount);
+    cartItems.forEach(item => {
       price += item.price.mrp * item.qty;
-      discount += (item.price.mrp - item.price.cost) * item.qty;
+      discount_bubble += (item.price.mrp - item.price.cost) * item.qty;
     });
 
-    if(coupon){
-      console.log(coupon)
-      if(coupon.delievery){
-        setDeliveryCharges(0);
-      }
-      else{
-        discount += coupon.percentageoff*price>coupon.maxoff?coupon.maxoff:coupon.percentageoff*price;
-        setDeliveryCharges(price - discount > 5000 ? 0 : 50);
-      }
+    if(tmpcoupon.delievery){
+      setDeliveryCharges(0);
+    } else{
+      console.log("milna chahiye", tmpcoupon.percentageoff*price, tmpcoupon.maxoff);
+      discount_bubble += tmpcoupon.percentageoff*price>tmpcoupon.maxoff?tmpcoupon.maxoff:tmpcoupon.percentageoff*price;
+      setDeliveryCharges(price - discount > 5000 ? 0 : 50);
     }
-    
 
     setPrice(price);
-    setDiscount(discount);
-   
+    setDiscount(discount_bubble);
 
+    console.log("price hai and discount hai abhi4 ", price, discount);
     if (page === "checkout") {
       dispatch(setTotalAmount(price - discount + deliveryCharges));
     }
   };
+
+
+  useEffect(() => {
+    const totalAmount = () => {
+      let price = 0,
+      discount = 0;
+      cartItems.map((item) => {
+        price += item.price.mrp * item.qty;
+        discount += (item.price.mrp - item.price.cost) * item.qty;
+        
+      });
+      
+      setPrice(price);
+      setDiscount(discount);
+      setDeliveryCharges(price - discount > 5000 ? 0 : 50);
+      console.log("price hai and discount hai abhi2", price, discount, deliveryCharges);
+      if (page === "checkout") {
+        dispatch(setTotalAmount(price - discount + deliveryCharges));
+      }
+    };
+    totalAmount();
+  }, [cartItems, stateChangeNotifyCounter]);
 
 
 
@@ -290,8 +179,8 @@ const [availableRewards,setAvailableRewards] = useState([]);
         </Typography>
 
         <div>
-      <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-        <InputLabel id="demo-simple-select-standard-label">Age</InputLabel>
+      <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }} className='w-full'>
+        <InputLabel id="demo-simple-select-standard-label">Select Coupon</InputLabel>
         <Select
           labelId="demo-simple-select-standard-label"
           id="demo-simple-select-standard"
@@ -299,10 +188,10 @@ const [availableRewards,setAvailableRewards] = useState([]);
           onChange={handleCouponChange}
           label="Coupon"
         >
-          <MenuItem value="">
-            <em>None</em>
+          <MenuItem value={"None"}>
+            <em>{"None"}</em>
           </MenuItem>
-          {availableRewards.map((coup) =>  (<MenuItem value={coup}>{coup.title}</MenuItem>))}
+          {availableRewards.map((coup) =>  (<MenuItem key={coup.title} value={coup.title}>{coup.title}</MenuItem>))}
         </Select>
       </FormControl>
       
