@@ -6,7 +6,7 @@
   "repository": "https://github.com/dhavalCode/flipkart-clone",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npm install &&cd client && npm install && npm run build",
+    "build": "npm install && cd client && npm install && npm run build",
     "start": "node index.js"
   },
   "author": "Pragun Shivam Yash",
