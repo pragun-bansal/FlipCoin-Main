@@ -5,6 +5,9 @@ To start the project, you need to have the following installed:
 
 To start the project, run the following commands in the terminal:
 - `npm install`
+- `cd client`
+- `npm install`
+- `npm run build`
 - Create a .env file in root folder 
 - Paste the following in .env file
 ```
