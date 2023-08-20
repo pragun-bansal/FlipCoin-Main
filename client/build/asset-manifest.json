@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/static/css/main.f6212991.css",
-    "main.js": "/static/js/main.71f41ba1.js",
+    "main.js": "/static/js/main.56cdc71a.js",
     "static/media/monitors-laptop.png": "/static/media/monitors-laptop.38005f75c59f1ca8ffd4.png",
     "static/media/try_again.png": "/static/media/try_again.4ff9f5ee3748f833f68d.png",
     "static/media/success.png": "/static/media/success.f312cc26cadaa2b635ff.png",
@@ -11,10 +11,10 @@
     "static/media/revicons.woff": "/static/media/revicons.e8746a624ed098489406.woff",
     "index.html": "/index.html",
     "main.f6212991.css.map": "/static/css/main.f6212991.css.map",
-    "main.71f41ba1.js.map": "/static/js/main.71f41ba1.js.map"
+    "main.56cdc71a.js.map": "/static/js/main.56cdc71a.js.map"
   },
   "entrypoints": [
     "static/css/main.f6212991.css",
-    "static/js/main.71f41ba1.js"
+    "static/js/main.56cdc71a.js"
   ]
 }

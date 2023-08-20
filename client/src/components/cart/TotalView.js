@@ -12,7 +12,7 @@ import { setTotalAmount } from "../../actions/orderActions";
 import { BACKEND_URL, CONTRACT_ADDRESS, TOKEN_ADDRESS } from "../../bkd";
 import authentication from "../../adapters/authentication";
 import { setUserInfo } from "../../actions/userActions";
-import axios from "axios";
+import axios from "../../adapters/axios";
 
 
 const useStyle = makeStyles({
@@ -62,17 +62,20 @@ const TotalView = ({ page = "cart",setCouponId,couponId }) => {
 
   useEffect(() => {
 
-    // if(!user.isAuthenticate){
+    // if(!isAuthenticate){
     //   window.location.replace("/login");
     // }
 
     const getRewards = async () => {
         const {data }=await axios.get(`${BACKEND_URL}/coupons`);
         setRewards(data);
+        console.log(data);
+        console.log(user.availableCoupons);
         let temp = data.filter(reward =>
           user.availableCoupons.some(tmp => tmp.couponId === reward._id && tmp.claimed===false)
         );
-        setAvailableRewards(temp);     
+        setAvailableRewards(temp);   
+        console.log(temp);  
       }
       getRewards();
     },[])
