@@ -24,7 +24,7 @@
     "react-icons": "^4.10.1",
     "react-material-ui-carousel": "^2.3.1",
     "react-multi-carousel": "^2.6.5",
-    "react-otp-input": "^2.4.0",
+    "react-otp-input": "^3.0.4",
     "react-redux": "^7.2.5",
     "react-rewards": "^2.0.4",
     "react-router-dom": "^5.3.4",
