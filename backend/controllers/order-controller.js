@@ -8,9 +8,11 @@ const completeOrder = async (req, res) => {
     const user = await User.findById(req.body.userId);
     if (!user) return res.status(400).send("Invalid User");
     console.log(user);
+    console.log(req.body);
     const order = new Order({ ...req.body, orderDate: Date.now() });
     user.totalOrders++;
     user.totalAmount += order.totalAmount;
+    console.log("total orders", user.totalOrders);
     
     const achivids = new Set();
     user.availableachievements.forEach((achievement) => {
@@ -89,6 +91,7 @@ const getOrderDetails = async (req, res) => {
       },
       { $sort: { orderDate: -1 } },
     ]);
+    console.log("result",result)
     res.json(result);
   } catch (error) {
     console.log(error);

@@ -14,7 +14,7 @@ import {
 import ToastMessageContainer from "../components/ToastMessageContainer";
 import { ethers } from "ethers";
 import Flcabi from "../utils/flcabi.json";
-import { AiFillLock } from "react-icons/ai";
+import { AiFillLock, AiOutlineCheckCircle } from "react-icons/ai";
 import axios from "../adapters/axios";
 import { BACKEND_URL, CONTRACT_ADDRESS, TOKEN_ADDRESS } from "../bkd";
 import { useDispatch, useSelector } from "react-redux";
@@ -238,18 +238,19 @@ const RewardPage = () => {
               <p className="text-center">{rew.description}</p>
               {
                 <button
-                  className="py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 active:bg-blue-700 disabled:opacity-50 mt-4 w-full flex items-center justify-center gap-2"
+                  className="py-4 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 active:bg-blue-700 disabled:opacity-50 mt-4 w-full flex items-center justify-center gap-2 "
                   onClick={() => {
                     redeemCouponfunc(rew.cost, rew._id);
                   }}
                   disabled={true}
                 >
-                  {
-                    <div id="rewardId" className="w-full h-full ">
+                  
+                    {/* <div id="rewardId" className="w-full h-full ">
                       Redeem Coupon
                       <p className=" ">({rew.cost} FLC)</p>
-                    </div>
-                  }
+                    </div> */}
+                    <AiOutlineCheckCircle size={30}/>
+                  
                 </button>
               }
             </div>

@@ -68,101 +68,101 @@ const Rewards = () => {
   const [lockedAchievements, setLockedAchievements] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // const { user, isAuthenticate } = useSelector((state) => state.userReducer);
-  const user = {
-    _id: {
-      $oid: "64e067592f2b67f1c0e81fa9",
-    },
-    fname: "Shivam",
-    lname: "Gupta",
-    password: "$2a$12$QIcTrEiLhxAL6rthb1iKhOImIA6olIGrkhA1CCE1MIqG3kMHfUR9m",
-    phone: 7015145611,
-    role: "admin",
-    totalOrders: 15,
-    totalAmount: 945184,
-    claimedachievements: [
-      {
-        achievementId: {
-          $oid: "64e0cfce3180bd12b0734131",
-        },
-        claimedDate: {
-          $date: "2023-08-19T14:37:28.477Z",
-        },
-        _id: {
-          $oid: "64e0d3d9abfd8f388b82123e",
-        },
-      },
-      {
-        achievementId: {
-          $oid: "64e0d137a1da333ed344579b",
-        },
-        claimedDate: {
-          $date: "2023-08-19T14:37:28.477Z",
-        },
-        _id: {
-          $oid: "64e0d3e2abfd8f388b821265",
-        },
-      },
-      {
-        achievementId: {
-          $oid: "64e0ccfb85b8439299b785dd",
-        },
-        claimedDate: {
-          $date: "2023-08-19T14:45:32.311Z",
-        },
-        _id: {
-          $oid: "64e0d5a699340f591144a497",
-        },
-      },
-    ],
-    availableachievements: [
-      {
-        achievementId: {
-          $oid: "64e0d2cf58d65abfae0564a1",
-        },
-        unlockDate: {
-          $date: "2023-08-19T14:45:48.803Z",
-        },
-        _id: {
-          $oid: "64e0d59c99340f591144a47a",
-        },
-      },
-    ],
-    tokens: [
-      {
-        token:
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGUwNjc1OTJmMmI2N2YxYzBlODFmYTkiLCJpYXQiOjE2OTI0NTE1OTd9.l9GsTEmkxWUL-zddKZZNdOw-5ZQ3HjK3DLhbbSDmYS8",
-        _id: {
-          $oid: "64e0c30d1e3ae320de4d881f",
-        },
-      },
-      {
-        token:
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGUwNjc1OTJmMmI2N2YxYzBlODFmYTkiLCJpYXQiOjE2OTI0NTE3ODZ9.EbBTV8QP7MWnsEX-X7caZqckMcSeRbF1qoPJE3ZWzns",
-        _id: {
-          $oid: "64e0c3ca1e3ae320de4d8850",
-        },
-      },
-      {
-        token:
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGUwNjc1OTJmMmI2N2YxYzBlODFmYTkiLCJpYXQiOjE2OTI0NTE5NDV9.hQpW-6iHmlD1SJJ6zu3BIMmcM4p6vWf3ttTEPmox2xM",
-        _id: {
-          $oid: "64e0c4691e3ae320de4d8871",
-        },
-      },
-      {
-        token:
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGUwNjc1OTJmMmI2N2YxYzBlODFmYTkiLCJpYXQiOjE2OTI0NTIwMDd9.e15itZoKXLht7uT2MsmYTC826J15My7Zmb47GECxC6Q",
-        _id: {
-          $oid: "64e0c4a71e3ae320de4d8886",
-        },
-      },
-    ],
-    __v: 37,
-    availableCoupons: [],
-  };
+  const { user, isAuthenticate } = useSelector((state) => state.userReducer);
+  // const user = {
+  //   _id: {
+  //     $oid: "64e067592f2b67f1c0e81fa9",
+  //   },
+  //   fname: "Shivam",
+  //   lname: "Gupta",
+  //   password: "$2a$12$QIcTrEiLhxAL6rthb1iKhOImIA6olIGrkhA1CCE1MIqG3kMHfUR9m",
+  //   phone: 7015145611,
+  //   role: "admin",
+  //   totalOrders: 15,
+  //   totalAmount: 945184,
+  //   claimedachievements: [
+  //     {
+  //       achievementId: {
+  //         $oid: "64e0cfce3180bd12b0734131",
+  //       },
+  //       claimedDate: {
+  //         $date: "2023-08-19T14:37:28.477Z",
+  //       },
+  //       _id: {
+  //         $oid: "64e0d3d9abfd8f388b82123e",
+  //       },
+  //     },
+  //     {
+  //       achievementId: {
+  //         $oid: "64e0d137a1da333ed344579b",
+  //       },
+  //       claimedDate: {
+  //         $date: "2023-08-19T14:37:28.477Z",
+  //       },
+  //       _id: {
+  //         $oid: "64e0d3e2abfd8f388b821265",
+  //       },
+  //     },
+  //     {
+  //       achievementId: {
+  //         $oid: "64e0ccfb85b8439299b785dd",
+  //       },
+  //       claimedDate: {
+  //         $date: "2023-08-19T14:45:32.311Z",
+  //       },
+  //       _id: {
+  //         $oid: "64e0d5a699340f591144a497",
+  //       },
+  //     },
+  //   ],
+  //   availableachievements: [
+  //     {
+  //       achievementId: {
+  //         $oid: "64e0d2cf58d65abfae0564a1",
+  //       },
+  //       unlockDate: {
+  //         $date: "2023-08-19T14:45:48.803Z",
+  //       },
+  //       _id: {
+  //         $oid: "64e0d59c99340f591144a47a",
+  //       },
+  //     },
+  //   ],
+  //   tokens: [
+  //     {
+  //       token:
+  //         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGUwNjc1OTJmMmI2N2YxYzBlODFmYTkiLCJpYXQiOjE2OTI0NTE1OTd9.l9GsTEmkxWUL-zddKZZNdOw-5ZQ3HjK3DLhbbSDmYS8",
+  //       _id: {
+  //         $oid: "64e0c30d1e3ae320de4d881f",
+  //       },
+  //     },
+  //     {
+  //       token:
+  //         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGUwNjc1OTJmMmI2N2YxYzBlODFmYTkiLCJpYXQiOjE2OTI0NTE3ODZ9.EbBTV8QP7MWnsEX-X7caZqckMcSeRbF1qoPJE3ZWzns",
+  //       _id: {
+  //         $oid: "64e0c3ca1e3ae320de4d8850",
+  //       },
+  //     },
+  //     {
+  //       token:
+  //         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGUwNjc1OTJmMmI2N2YxYzBlODFmYTkiLCJpYXQiOjE2OTI0NTE5NDV9.hQpW-6iHmlD1SJJ6zu3BIMmcM4p6vWf3ttTEPmox2xM",
+  //       _id: {
+  //         $oid: "64e0c4691e3ae320de4d8871",
+  //       },
+  //     },
+  //     {
+  //       token:
+  //         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGUwNjc1OTJmMmI2N2YxYzBlODFmYTkiLCJpYXQiOjE2OTI0NTIwMDd9.e15itZoKXLht7uT2MsmYTC826J15My7Zmb47GECxC6Q",
+  //       _id: {
+  //         $oid: "64e0c4a71e3ae320de4d8886",
+  //       },
+  //     },
+  //   ],
+  //   __v: 37,
+  //   availableCoupons: [],
+  // };
 
-  const isAuthenticate = true;
+  // const isAuthenticate = true;
 
   let userid;
   if (user._id) userid = user._id;
@@ -201,7 +201,7 @@ const Rewards = () => {
         useravailableachievementsids.includes(achievement._id)
       );
       setAvailableAchievements(temp);
-
+      console.log("availableAchievements: ", temp);
       const userclaimedachievementsids = user.claimedachievements.map(
         (achievement) => achievement.achievementId
       );
@@ -210,6 +210,7 @@ const Rewards = () => {
         userclaimedachievementsids.includes(achievement._id)
       );
       setClaimedAchievements(temp);
+      console.log("claimedAchievements: ", temp);
 
       temp = data.filter(
         (achievement) =>
@@ -220,9 +221,9 @@ const Rewards = () => {
       );
       setLockedAchievements(temp);
 
-      console.log("availableAchievements: ", availableAchievements);
-      console.log("claimedAchievements: ", claimedAchievements);
-      console.log("lockedAchievements: ", lockedAchievements);
+
+      
+      console.log("lockedAchievements: ", temp);
 
       setLoading(false);
     };

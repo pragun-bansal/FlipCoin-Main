@@ -161,6 +161,7 @@ const CheckoutPage = () => {
 
   const history = useHistory();
   const query = useQuery();
+  const [couponId,setCouponId] = useState("");
 
   useEffect(() => {
     //check if request from cart page or not
@@ -217,6 +218,7 @@ const CheckoutPage = () => {
           addressId: selectedAddr._id,
           totalAmount: totalAmount,
           paymentMode: paymentMode,
+          couponid: couponId,
           paymentStatus: "Completed",
         });
         await dispatch(clearCart());
@@ -234,6 +236,7 @@ const CheckoutPage = () => {
           totalAmount: totalAmount,
           paymentMode: paymentMode,
           paymentStatus: "Initiated",
+          couponid: couponId,
         });
 
         const { data } = await axios.post(`${BACKEND_URL}/payment/paytm`, {
@@ -462,7 +465,7 @@ const CheckoutPage = () => {
             </Box>
           </Grid>
           <Grid item lg={4} md={4} sm={12} xs={12}>
-            <TotalView page="checkout" />
+            <TotalView page="checkout" setCouponId={setCouponId} couponId={couponId}/>
             <Box style={{ marginTop: 20 }}>
               <img style={{ width: "100%" }} src={superCoin} alt="Super Coin" />
             </Box>

@@ -19,10 +19,11 @@ const useStyle = makeStyles((theme) => ({
   header: {
     backgroundColor: "#2874f0",
     height: 60,
+    width: "100%",
     paddingLeft: "10%",
     lineHeight: 0,
     display: "flex",
-    justifyContent: "center",
+    justifyContent: "space-around",
     boxShadow: "none",
     [theme.breakpoints.down("md")]: {
       justifyContent: "space-between",

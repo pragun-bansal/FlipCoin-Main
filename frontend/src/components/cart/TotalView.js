@@ -41,7 +41,7 @@ const useStyle = makeStyles({
   },
 });
 
-const TotalView = ({ page = "cart" }) => {
+const TotalView = ({ page = "cart",setCouponId,couponId }) => {
   const dispatch = useDispatch();
   useEffect(() => {
     authentication().then((res) => {
@@ -56,6 +56,7 @@ const TotalView = ({ page = "cart" }) => {
   const [rewards,setRewards] = useState([]);
   const [availableRewards,setAvailableRewards] = useState([]);
   const [coupon, setCoupon] = useState("None");
+  
   const { user } = useSelector((state) => state.userReducer);
 
 
@@ -72,7 +73,7 @@ const TotalView = ({ page = "cart" }) => {
         console.log(user.availableCoupons);
         setRewards(data);
         let temp = data.filter(reward =>
-          user.availableCoupons.some(tmp => tmp.couponId === reward._id)
+          user.availableCoupons.some(tmp => tmp.couponId === reward._id && tmp.claimed===false)
         );
         setAvailableRewards(temp);     
       }
@@ -85,58 +86,58 @@ const TotalView = ({ page = "cart" }) => {
     let tmpcoupon = availableRewards.find(tmp => tmp.title === event.target.value);
     // let tmpcoupon = event.target.value;
     if(tmpcoupon === undefined){
-      tmpcoupon = {title:"None",description:"",percentageoff: 0,maxoff: 0, delievery:false,cost:0}
+      tmpcoupon = {title:"None",description:"",percentageoff: 0,maxoff: 0, delievery:false,cost:0,_id:""};
     }
 
     setCoupon(tmpcoupon.title);
-
+    if(setCouponId)setCouponId(tmpcoupon._id);
 
     // const parsedObject = event.target.value;
     // setCoupon(prevCoupon => ({...prevCoupon,_id:parsedObject._id, }));
     // console.log("coupon hai", coupon,{...parsedObject});
-    let price = 0;
+    let pr = 0;
     let discount_bubble = 0;
     console.log("coupon hai", coupon);
-    console.log("price hai and discount hai abhi", price, discount);
+    console.log("price hai and discount hai abhi", pr, discount);
     cartItems.forEach(item => {
-      price += item.price.mrp * item.qty;
+      pr += item.price.mrp * item.qty;
       discount_bubble += (item.price.mrp - item.price.cost) * item.qty;
     });
 
     if(tmpcoupon.delievery){
       setDeliveryCharges(0);
     } else{
-      console.log("milna chahiye", tmpcoupon.percentageoff*price, tmpcoupon.maxoff);
-      discount_bubble += tmpcoupon.percentageoff*price>tmpcoupon.maxoff?tmpcoupon.maxoff:tmpcoupon.percentageoff*price;
-      setDeliveryCharges(price - discount > 5000 ? 0 : 50);
+      console.log("milna chahiye", tmpcoupon.percentageoff*pr, tmpcoupon.maxoff);
+      discount_bubble += tmpcoupon.percentageoff*pr>tmpcoupon.maxoff?tmpcoupon.maxoff:tmpcoupon.percentageoff*pr;
+      setDeliveryCharges(pr - discount > 5000 ? 0 : 50);
     }
 
-    setPrice(price);
+    setPrice(pr);
     setDiscount(discount_bubble);
 
-    console.log("price hai and discount hai abhi4 ", price, discount);
+    console.log("price hai and discount hai abhi4 ", pr, discount_bubble);
     if (page === "checkout") {
-      dispatch(setTotalAmount(price - discount + deliveryCharges));
+      dispatch(setTotalAmount(pr - discount_bubble + (pr - discount > 5000 ? 0 : 50)));
     }
   };
 
 
   useEffect(() => {
     const totalAmount = () => {
-      let price = 0,
-      discount = 0;
+      let pr = 0;
+      let disc = 0;
       cartItems.map((item) => {
-        price += item.price.mrp * item.qty;
-        discount += (item.price.mrp - item.price.cost) * item.qty;
+        pr += item.price.mrp * item.qty;
+        disc += (item.price.mrp - item.price.cost) * item.qty;
         
       });
       
-      setPrice(price);
-      setDiscount(discount);
-      setDeliveryCharges(price - discount > 5000 ? 0 : 50);
-      console.log("price hai and discount hai abhi2", price, discount, deliveryCharges);
+      setPrice(pr);
+      setDiscount(disc);
+      setDeliveryCharges(pr - disc > 5000 ? 0 : 50);
+      console.log("price hai and discount hai abhi2", pr, disc, (pr - disc > 5000 ? 0 : 50));
       if (page === "checkout") {
-        dispatch(setTotalAmount(price - discount + deliveryCharges));
+        dispatch(setTotalAmount(pr - disc + (pr - disc > 5000 ? 0 : 50)));
       }
     };
     totalAmount();
