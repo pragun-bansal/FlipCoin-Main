@@ -19,6 +19,14 @@ SECRET_KEY= 1234567890
 ```
 - npm start
 
+## Import token on sepolia testnet
+
+```
+tokenAddress= 0xc1c62B3f6Ba557233f4Fe93C0e824Ae04234666F
+tokenSymbol = 'FLC';
+tokenDecimals = 18;
+```
+
 
 ## Deployed Link -
 [Link](https://flipkart-web.vercel.app/)

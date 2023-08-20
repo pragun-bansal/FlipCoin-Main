@@ -3,10 +3,9 @@ var cookieParser = require("cookie-parser");
 const cors = require("cors");
 
 require("dotenv").config({ path: "./config/.env" });
-
 require("./config/DBConnection");
-const useRouter = require("./routes/router");
 
+const useRouter = require("./routes/router");
 const app = express();
 
 //app uses
@@ -22,15 +21,10 @@ const port = process.env.PORT || 5005;
 
 
 if (process.env.NODE_ENV == "production") {
-  app.use((req, res, next) => {
-    if (req.header("x-forwarded-proto") !== "https") {
-      res.redirect(`https://${req.header("host")}${req.url}`);
-    } else {
-      next();
-    }
-  });
 
   const path = require("path");
+
+  console.log(path.join(__dirname, "client", "build/static"))
 
   app.use(
     "/static",
