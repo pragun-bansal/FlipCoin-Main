@@ -1,18 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { useReward } from "react-rewards";
-import { makeStyles, Grid, Container, CircularProgress, } from "@material-ui/core";
+import {
+  makeStyles,
+  Grid,
+  Container,
+  CircularProgress,
+} from "@material-ui/core";
 import ToastMessageContainer from "../components/ToastMessageContainer";
 import { ethers } from "ethers";
 import { AiFillLock } from "react-icons/ai";
 import axios from "../adapters/axios";
-import {  BACKEND_URL, CONTRACT_ADDRESS } from "../bkd";
+import { BACKEND_URL, CONTRACT_ADDRESS } from "../bkd";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import Transactionabi from "../utils/transactionsabi.json";
 import toastMessage from "../utils/toastMessage";
 import authentication from "../adapters/authentication";
 import { setUserInfo } from "../actions/userActions";
-
 
 const useStyle = makeStyles((theme) => ({
   component: {
@@ -50,117 +54,115 @@ const useStyle = makeStyles((theme) => ({
   },
 }));
 
-
-
 const Rewards = () => {
-
   const classes = useStyle();
-  const { reward, isAnimating } = useReward("rewardId", "confetti", {elementCount: 100,});
-
-  
-
+  const { reward, isAnimating } = useReward("rewardId", "confetti", {
+    elementCount: 100,
+  });
 
   const [transactions, setTransactions] = useState([]);
+
   const [popupOpen, setPopupOpen] = useState(false);
   const [availableAchievements, setAvailableAchievements] = useState([]);
   const [claimedAchievements, setClaimedAchievements] = useState([]);
   const [lockedAchievements, setLockedAchievements] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  
+  // const { user, isAuthenticate } = useSelector((state) => state.userReducer);
+  const user = {
+    _id: {
+      $oid: "64e067592f2b67f1c0e81fa9",
+    },
+    fname: "Shivam",
+    lname: "Gupta",
+    password: "$2a$12$QIcTrEiLhxAL6rthb1iKhOImIA6olIGrkhA1CCE1MIqG3kMHfUR9m",
+    phone: 7015145611,
+    role: "admin",
+    totalOrders: 15,
+    totalAmount: 945184,
+    claimedachievements: [
+      {
+        achievementId: {
+          $oid: "64e0cfce3180bd12b0734131",
+        },
+        claimedDate: {
+          $date: "2023-08-19T14:37:28.477Z",
+        },
+        _id: {
+          $oid: "64e0d3d9abfd8f388b82123e",
+        },
+      },
+      {
+        achievementId: {
+          $oid: "64e0d137a1da333ed344579b",
+        },
+        claimedDate: {
+          $date: "2023-08-19T14:37:28.477Z",
+        },
+        _id: {
+          $oid: "64e0d3e2abfd8f388b821265",
+        },
+      },
+      {
+        achievementId: {
+          $oid: "64e0ccfb85b8439299b785dd",
+        },
+        claimedDate: {
+          $date: "2023-08-19T14:45:32.311Z",
+        },
+        _id: {
+          $oid: "64e0d5a699340f591144a497",
+        },
+      },
+    ],
+    availableachievements: [
+      {
+        achievementId: {
+          $oid: "64e0d2cf58d65abfae0564a1",
+        },
+        unlockDate: {
+          $date: "2023-08-19T14:45:48.803Z",
+        },
+        _id: {
+          $oid: "64e0d59c99340f591144a47a",
+        },
+      },
+    ],
+    tokens: [
+      {
+        token:
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGUwNjc1OTJmMmI2N2YxYzBlODFmYTkiLCJpYXQiOjE2OTI0NTE1OTd9.l9GsTEmkxWUL-zddKZZNdOw-5ZQ3HjK3DLhbbSDmYS8",
+        _id: {
+          $oid: "64e0c30d1e3ae320de4d881f",
+        },
+      },
+      {
+        token:
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGUwNjc1OTJmMmI2N2YxYzBlODFmYTkiLCJpYXQiOjE2OTI0NTE3ODZ9.EbBTV8QP7MWnsEX-X7caZqckMcSeRbF1qoPJE3ZWzns",
+        _id: {
+          $oid: "64e0c3ca1e3ae320de4d8850",
+        },
+      },
+      {
+        token:
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGUwNjc1OTJmMmI2N2YxYzBlODFmYTkiLCJpYXQiOjE2OTI0NTE5NDV9.hQpW-6iHmlD1SJJ6zu3BIMmcM4p6vWf3ttTEPmox2xM",
+        _id: {
+          $oid: "64e0c4691e3ae320de4d8871",
+        },
+      },
+      {
+        token:
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGUwNjc1OTJmMmI2N2YxYzBlODFmYTkiLCJpYXQiOjE2OTI0NTIwMDd9.e15itZoKXLht7uT2MsmYTC826J15My7Zmb47GECxC6Q",
+        _id: {
+          $oid: "64e0c4a71e3ae320de4d8886",
+        },
+      },
+    ],
+    __v: 37,
+    availableCoupons: [],
+  };
 
-  const { user,isAuthenticate } = useSelector((state) => state.userReducer);
-  // const user = {
-  //   "_id": {
-  //     "$oid": "64e067592f2b67f1c0e81fa9"
-  //   },
-  //   "fname": "Shivam",
-  //   "lname": "Gupta",
-  //   "password": "$2a$12$QIcTrEiLhxAL6rthb1iKhOImIA6olIGrkhA1CCE1MIqG3kMHfUR9m",
-  //   "phone": 7015145611,
-  //   "role": "admin",
-  //   "totalOrders": 15,
-  //   "totalAmount": 945184,
-  //   "claimedachievements": [
-  //     {
-  //       "achievementId": {
-  //         "$oid": "64e0cfce3180bd12b0734131"
-  //       },
-  //       "claimedDate": {
-  //         "$date": "2023-08-19T14:37:28.477Z"
-  //       },
-  //       "_id": {
-  //         "$oid": "64e0d3d9abfd8f388b82123e"
-  //       }
-  //     },
-  //     {
-  //       "achievementId": {
-  //         "$oid": "64e0d137a1da333ed344579b"
-  //       },
-  //       "claimedDate": {
-  //         "$date": "2023-08-19T14:37:28.477Z"
-  //       },
-  //       "_id": {
-  //         "$oid": "64e0d3e2abfd8f388b821265"
-  //       }
-  //     },
-  //     {
-  //       "achievementId": {
-  //         "$oid": "64e0ccfb85b8439299b785dd"
-  //       },
-  //       "claimedDate": {
-  //         "$date": "2023-08-19T14:45:32.311Z"
-  //       },
-  //       "_id": {
-  //         "$oid": "64e0d5a699340f591144a497"
-  //       }
-  //     }
-  //   ],
-  //   "availableachievements": [
-  //     {
-  //       "achievementId": {
-  //         "$oid": "64e0d2cf58d65abfae0564a1"
-  //       },
-  //       "unlockDate": {
-  //         "$date": "2023-08-19T14:45:48.803Z"
-  //       },
-  //       "_id": {
-  //         "$oid": "64e0d59c99340f591144a47a"
-  //       }
-  //     }
-  //   ],
-  //   "tokens": [
-  //     {
-  //       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGUwNjc1OTJmMmI2N2YxYzBlODFmYTkiLCJpYXQiOjE2OTI0NTE1OTd9.l9GsTEmkxWUL-zddKZZNdOw-5ZQ3HjK3DLhbbSDmYS8",
-  //       "_id": {
-  //         "$oid": "64e0c30d1e3ae320de4d881f"
-  //       }
-  //     },
-  //     {
-  //       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGUwNjc1OTJmMmI2N2YxYzBlODFmYTkiLCJpYXQiOjE2OTI0NTE3ODZ9.EbBTV8QP7MWnsEX-X7caZqckMcSeRbF1qoPJE3ZWzns",
-  //       "_id": {
-  //         "$oid": "64e0c3ca1e3ae320de4d8850"
-  //       }
-  //     },
-  //     {
-  //       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGUwNjc1OTJmMmI2N2YxYzBlODFmYTkiLCJpYXQiOjE2OTI0NTE5NDV9.hQpW-6iHmlD1SJJ6zu3BIMmcM4p6vWf3ttTEPmox2xM",
-  //       "_id": {
-  //         "$oid": "64e0c4691e3ae320de4d8871"
-  //       }
-  //     },
-  //     {
-  //       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGUwNjc1OTJmMmI2N2YxYzBlODFmYTkiLCJpYXQiOjE2OTI0NTIwMDd9.e15itZoKXLht7uT2MsmYTC826J15My7Zmb47GECxC6Q",
-  //       "_id": {
-  //         "$oid": "64e0c4a71e3ae320de4d8886"
-  //       }
-  //     }
-  //   ],
-  //   "__v": 37,
-  //   "availableCoupons": []
-  // }
-
-  // const isAuthenticate = true;
-
+  const isAuthenticate = true;
 
   let userid;
   if (user._id) userid = user._id;
@@ -169,17 +171,16 @@ const Rewards = () => {
   const dispatch = useDispatch();
   const history = useHistory();
 
-  if(!isAuthenticate){
+  if (!isAuthenticate) {
     toastMessage("Please login to enter Flipkart Rewards", "error");
     history.push("/login");
   }
 
-
   useEffect(() => {
     authentication().then((res) => {
       console.log("user: ", res);
-      dispatch(setUserInfo(res.user))
-    })
+      dispatch(setUserInfo(res.user));
+    });
   }, [dispatch]);
 
   useEffect(() => {
@@ -193,16 +194,30 @@ const Rewards = () => {
 
       // in case any object of user.availableachievements has achievementId == data's achievementId
       // then that achievement is available to user
-      const useravailableachievementsids = user.availableachievements.map((achievement) => achievement.achievementId);
-      let temp = data.filter((achievement) => useravailableachievementsids.includes(achievement._id));
+      const useravailableachievementsids = user.availableachievements.map(
+        (achievement) => achievement.achievementId
+      );
+      let temp = data.filter((achievement) =>
+        useravailableachievementsids.includes(achievement._id)
+      );
       setAvailableAchievements(temp);
 
-      const userclaimedachievementsids = user.claimedachievements.map((achievement) => achievement.achievementId);
+      const userclaimedachievementsids = user.claimedachievements.map(
+        (achievement) => achievement.achievementId
+      );
       console.log("userclaimedachievementsids: ", userclaimedachievementsids);
-      temp  = data.filter((achievement) => userclaimedachievementsids.includes(achievement._id));
+      temp = data.filter((achievement) =>
+        userclaimedachievementsids.includes(achievement._id)
+      );
       setClaimedAchievements(temp);
-      
-      temp = data.filter((achievement) => !(useravailableachievementsids.includes(achievement._id) || userclaimedachievementsids.includes(achievement._id)));
+
+      temp = data.filter(
+        (achievement) =>
+          !(
+            useravailableachievementsids.includes(achievement._id) ||
+            userclaimedachievementsids.includes(achievement._id)
+          )
+      );
       setLockedAchievements(temp);
 
       console.log("availableAchievements: ", availableAchievements);
@@ -216,12 +231,6 @@ const Rewards = () => {
 
   // user state from redux
 
-
-
-
-
-
-
   const claimrewardfunc = async (rewardAmount, achievementid) => {
     try {
       await window.ethereum.request({ method: "eth_requestAccounts" });
@@ -232,10 +241,20 @@ const Rewards = () => {
       const userAddress = await signer.getAddress();
 
       const nonce = Math.floor(Math.random() * 1000000);
-      const contract = new ethers.Contract(CONTRACT_ADDRESS ,Transactionabi,signer);
+      const contract = new ethers.Contract(
+        CONTRACT_ADDRESS,
+        Transactionabi,
+        signer
+      );
       const message = "secret message";
-      let messageHash = await contract.getMessageHash(rewardAmount,message,nonce);
-      const signature = await signer.signMessage(ethers.utils.arrayify(messageHash));
+      let messageHash = await contract.getMessageHash(
+        rewardAmount,
+        message,
+        nonce
+      );
+      const signature = await signer.signMessage(
+        ethers.utils.arrayify(messageHash)
+      );
 
       await axios.post(`${BACKEND_URL}/requests`, {
         address: userAddress,
@@ -249,27 +268,33 @@ const Rewards = () => {
       });
       toastMessage("Reward claimed successfully", "success");
       setTimeout(() => {
-      window.location.reload();
+        window.location.reload();
       }, 2000);
-
     } catch (error) {
       console.error("Error claiming reward:", error);
     }
 
     // add to claimed achievements
-    const temp = availableAchievements.filter((achievement) => achievement._id === achievementid);
+    const temp = availableAchievements.filter(
+      (achievement) => achievement._id === achievementid
+    );
     setClaimedAchievements([...claimedAchievements, ...temp]);
   };
 
-  if(loading) return(
-    <div className="flex justify-center items-center h-screen">
-      <CircularProgress />
-    </div>
-  )
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <CircularProgress />
+      </div>
+    );
 
   return (
     <Container maxWidth={"lg"} className="mx-auto">
-      <div className="flex flex-row">
+      {/* <div className="mt-24 p-1 float-right ">
+        <span className="h-10 rounded-md bg-blue-500 px-4 py-2 text-white text-center font-medium">
+          Flipcoins Balance: {cryptoBalance}
+        </span>
+      </div> */}
       <Grid container className={classes.component}>
         {availableAchievements.map((ach, idx) => (
           <div
@@ -384,8 +409,6 @@ const Rewards = () => {
         ))}
       </Grid>
 
-
-      </div>
       <ToastMessageContainer />
     </Container>
   );
