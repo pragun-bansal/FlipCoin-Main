@@ -29,10 +29,8 @@ const getProductsByCategory = async (req, res) => {
 
 const getProductById = async (req, res) => {
   const productId = req.params.id;
-  console.log(productId);
   try {
     const result = await Product.findById(productId);
-    console.log(result);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error });

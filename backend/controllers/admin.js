@@ -37,10 +37,8 @@ async function submitRewardBatches(rewardClaims) {
 
     for (const txHash of txHashes) {
       const receipt = await provider.waitForTransaction(txHash);
-      console.log(`Transaction confirmed: ${txHash}`);
     }
 
-    console.log("Reward batches submitted successfully.");
   } catch (error) {
     console.error("Error submitting reward batches:", error);
   }

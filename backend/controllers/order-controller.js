@@ -7,12 +7,9 @@ const completeOrder = async (req, res) => {
   try {
     const user = await User.findById(req.body.userId);
     if (!user) return res.status(400).send("Invalid User");
-    console.log(user);
-    console.log(req.body);
     const order = new Order({ ...req.body, orderDate: Date.now() });
     user.totalOrders++;
     user.totalAmount += order.totalAmount;
-    console.log("total orders", user.totalOrders);
     
     const achivids = new Set();
     user.availableachievements.forEach((achievement) => {
@@ -29,11 +26,9 @@ const completeOrder = async (req, res) => {
     const newachievements = [];
     achievements.forEach((achievement) => {
       if (achievement.minorders <= user.totalOrders && achievement.minorderprice <= user.totalAmount) {
-          console.log("Now check ", achievement._id.toString(),"\n")
           if(!useravailableachievementsids.includes(achievement._id.toString()) && !userclaimedachievementsids.includes(achievement._id.toString())) newachievements.push({achievementId:achievement._id,unlockDate:Date.now()});
       }
     });
-    console.log(newachievements);
     user.availableachievements = user.availableachievements.concat(newachievements);
     if(req.body.couponid){
       user.availableCoupons = user.availableCoupons.map((coupon) => {
@@ -91,7 +86,6 @@ const getOrderDetails = async (req, res) => {
       },
       { $sort: { orderDate: -1 } },
     ]);
-    console.log("result",result)
     res.json(result);
   } catch (error) {
     console.log(error);

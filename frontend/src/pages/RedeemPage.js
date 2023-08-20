@@ -1,64 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { useReward } from "react-rewards";
-import {
-  makeStyles,
-  Grid,
-  Box,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Container,
-} from "@material-ui/core";
+import {Grid,Container, CircularProgress,} from "@material-ui/core";
 import ToastMessageContainer from "../components/ToastMessageContainer";
 import { ethers } from "ethers";
 import Flcabi from "../utils/flcabi.json";
-import { AiFillLock, AiOutlineCheckCircle } from "react-icons/ai";
+import {  AiOutlineCheckCircle } from "react-icons/ai";
 import axios from "../adapters/axios";
 import { BACKEND_URL, CONTRACT_ADDRESS, TOKEN_ADDRESS } from "../bkd";
 import { useDispatch, useSelector } from "react-redux";
-import { useHistory } from "react-router-dom";
-import Transactionabi from "../utils/transactionsabi.json";
 import toastMessage from "../utils/toastMessage";
 import authentication from "../adapters/authentication";
 import { setUserInfo } from "../actions/userActions";
 
-
-const useStyle = makeStyles((theme) => ({
-  component: {
-    marginTop: 55,
-    padding: "30px 6%",
-    display: "flex",
-    spacing: 4,
-  },
-  leftComponent: {
-    paddingRight: 15,
-    [theme.breakpoints.between(0, 960)]: {
-      paddingRight: 0,
-      marginBottom: 20,
-    },
-  },
-  header: {
-    padding: "15px 24px",
-    background: "#fff",
-  },
-  bottom: {
-    padding: "16px 22px",
-    background: "#fff",
-    boxShadow: "0 -2px 10px 0 rgb(0 0 0 / 10%)",
-    borderTop: "1px solid #f0f0f0",
-  },
-  placeOrder: {
-    display: "flex",
-    marginLeft: "auto",
-    background: "#fb641b",
-    color: "#fff",
-    borderRadius: 2,
-    width: 250,
-    height: 51,
-  },
-}));
 
 
 
@@ -66,48 +18,37 @@ const RewardPage = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     authentication().then((res) => {
-      console.log("user: ", res);
       dispatch(setUserInfo(res.user))
     })
   }, [dispatch]);
 
-  const classes = useStyle();
-  const { reward, isAnimating } = useReward("rewardId", "confetti", {
-    elementCount: 100,
-  });
   const [rewards, setRewards] = useState([]);
   const [claimedRewards, setClaimedRewards] = useState([]);
   const [availableRewards, setAvailableRewards] = useState([]);
-  const [cryptoBalance, setCryptoBalance] = useState(0);
-  const [transactions, setTransactions] = useState([]);
-  const [popupOpen, setPopupOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const { user } = useSelector((state) => state.userReducer);
+  const { user,isAuthenticate } = useSelector((state) => state.userReducer);
   let userid;
   if (user._id) userid = user._id;
   else userid = "64e06a77c96091c2139abc82";
   useEffect(() => {
 
-    // if(!user.isAuthenticate){
-    //   window.location.replace("/login");
-    // }
+    if(!isAuthenticate){
+      window.location.replace("/login");
+    }
 
     const getRewards = async () => {
-  const {data }=await axios.get(`${BACKEND_URL}/coupons`);
-  console.log(data)
-  console.log(rewards);
-  console.log(user.availableCoupons);
-  setRewards(data);
-  let temp = data.filter(reward =>
-    user.availableCoupons.some(coupon => coupon.couponId === reward._id)
-  );
-      setClaimedRewards(temp);
-      console.log("claimed rewards", temp);
-      temp =data.filter(reward =>
-        user.availableCoupons.every(coupon => coupon.couponId != reward._id)
-      );
-      setAvailableRewards(temp);
-      console.log("available rewards", temp);
+    const {data }=await axios.get(`${BACKEND_URL}/coupons`);
+    setRewards(data);
+    let temp = data.filter(reward =>
+      user.availableCoupons.some(coupon => coupon.couponId === reward._id)
+    );
+    setClaimedRewards(temp);
+    temp =data.filter(reward =>
+      user.availableCoupons.every(coupon => coupon.couponId != reward._id)
+    );
+    setAvailableRewards(temp);
+      
     }
     getRewards();
   },[])
@@ -115,28 +56,7 @@ const RewardPage = () => {
 
   // user state from redux
 
-  const connectWallet = async () => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    await provider.send("eth_requestAccounts", []);
-    const privateKey =
-      "8d1444ef95f13c8d0713e4319463d8d24316940a21a9624b81978d84c6c616f3"; // Admin's private key
-    const sender = new ethers.Wallet(privateKey, provider);
-    const signer = provider.getSigner();
-    const contract = new ethers.Contract(
-      "0xc1c62B3f6Ba557233f4Fe93C0e824Ae04234666F",
-      Flcabi,
-      sender
-    );
-    const walletaddress = await signer.getAddress();
-    console.log("sender's address is: ", walletaddress);
-    const balance = await contract.balanceOf(walletaddress);
-    console.log("balance: ", balance);
-    setCryptoBalance(ethers.utils.formatEther(balance));
-  };
-
-  useEffect(() => {
-    connectWallet();
-  }, []);
+ 
 
 
   async function fundRequestHandler(cost) {
@@ -144,29 +64,23 @@ const RewardPage = () => {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       await provider.send("eth_requestAccounts", []);
       const signer = await provider.getSigner();
-      console.log("signer",signer)
       const contract = new ethers.Contract(TOKEN_ADDRESS,Flcabi,signer);
-      console.log("contract",contract)
-      console.log("cost",cost)
       const val = ethers.utils.parseEther(cost.toString());
-      console.log("val",val)
       await contract.transfer(CONTRACT_ADDRESS,val);
-      // setSubmitting(true);
+      setLoading(true);
       contract.on("Transfer", (from, to, value) => {
         toastMessage("Funds Transferred SuccessFully","success");
-        // setSubmitting(false);
-        // setFundValue("");
-        // setReceiveAddress("");
+        setLoading(false);
       });
     } catch (error) {
       toastMessage("Error Occured while transferring FLC. Please try again later.","error");
       console.error("Error submitting reward batch:", error);
+      setLoading(false);
     }
   }
 
     const redeemCouponfunc = async (cost, couponid) => {
       try {
-        console.log("cost",cost, "couponid", couponid)
         await fundRequestHandler(cost);
 
         await axios.post(`${BACKEND_URL}/couponsredeem`, {
@@ -177,6 +91,13 @@ const RewardPage = () => {
         console.error("Error claiming reward:", error);
       }
     };
+
+  
+    if(loading) return(
+      <div className="flex justify-center items-center h-screen">
+        <CircularProgress />
+      </div>
+    )
 
   return (
     <Container maxWidth={"xl"} className="mt-20">

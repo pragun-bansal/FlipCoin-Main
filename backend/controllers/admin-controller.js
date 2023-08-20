@@ -5,13 +5,11 @@ const User = require("../models/userSchema");
 
 const getRequests = async (req, res) => {
     const userID = req.params.userid;
-    console.log("request: " ,userID);
     const user = await User.findById(userID);
     if (!user) return res.status(404).send(`No user with id: ${userID}`);
     if(user.role !== "admin") return res.status(403).send(`User with id: ${userID} is not an admin`);
     try {
         const requests = await Requests.find({});
-        console.log("requests: " ,requests);
         res.json(requests);
     } catch (error) {
         console.log(error);
@@ -68,7 +66,6 @@ const createRequest = async (req, res) => {
         user.claimedachievements.push({ achievementId: achievement._id, unlockDate: Date.now() });
         user.availableachievements = user.availableachievements.filter((achievement) => achievement.achievementId != req.body.achievementid);
         await user.save();
-        console.log("user: ", user);
         await newRequest.save();
         res.status(201).json(newRequest);
     }

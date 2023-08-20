@@ -8,6 +8,9 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import PowerSettingsNewIcon from "@material-ui/icons/PowerSettingsNew";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import FavoriteIcon from "@material-ui/icons/Favorite";
+import { IoIosWallet } from 'react-icons/io';
+import { PiCoinsDuotone } from 'react-icons/pi';
+
 
 const useStyles = makeStyles({
   container: {
@@ -51,6 +54,12 @@ function ProfileMenu({ logout }) {
         break;
       case "orders":
         history.push("/orders");
+        break;
+      case "redeem":
+        history.push("/redeem");
+        break;
+      case "flc-wallet":
+        history.push("/flipwallet");
         break;
       default:
         break;
@@ -130,6 +139,24 @@ function ProfileMenu({ logout }) {
         >
           <FavoriteIcon className={classes.menuIcon} />
           Wishlist
+        </MenuItem>
+        <Divider className={classes.divider} />
+        <MenuItem
+          id="flc-wallet"
+          className={classes.menuItem}
+          onClick={handleClose}
+        >
+          <IoIosWallet className={classes.menuIcon} />
+          FLC Wallet
+        </MenuItem>
+        <Divider className={classes.divider} />
+        <MenuItem
+          id="redeem"
+          className={classes.menuItem}
+          onClick={handleClose}
+        >
+          <PiCoinsDuotone className={classes.menuIcon} />
+          Redeem FLC
         </MenuItem>
         <Divider className={classes.divider} />
         <MenuItem

@@ -25,9 +25,7 @@ const createachievement = async (req, res) => {
     try {
     const achievement = req.body;
     const userId = mongoose.Types.ObjectId(req.body.userId);
-    console.log(req.body);
     const user = await User.findById(userId);
-    console.log(user);
     if (!user) return res.status(404).send(`No user with id: ${userId}`);
     const newachievement = new Achievement({ ...achievement, active: true });
     

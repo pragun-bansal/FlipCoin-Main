@@ -138,18 +138,6 @@ function HeaderMenu() {
         </Box>
       </Link>
 
-      <Link to="/redeem">
-        <Box className={classes.menu_link}>
-          <Typography className={classes.menu_more}>Redeem FLC</Typography>
-          {/* <ExpandMoreIcon /> */}
-        </Box>
-      </Link>
-      <Link to="/flipwallet">
-        <Box className={classes.menu_link}>
-          <Typography className={classes.menu_more}>FLC wallet</Typography>
-          {/* <ExpandMoreIcon /> */}
-        </Box>
-      </Link>
       <Link to="/cart">
         <Box className={classes.menu_link}>
           <ShoppingCartIcon />

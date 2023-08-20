@@ -52,17 +52,14 @@ const updateCoupon = async (req, res) => {
 
 const redeemCoupons = async (req, res) => {
     try {
-        console.log("entered redeem coupons")
         const userId = req.body.userid;
-    const user =await User.findById(userId);
-    console.log(user);
-    const couponId = req.body.couponId;
-    // const coupon = Coupon.findById(couponId);
-    user.availableCoupons.push({
-        couponId: couponId,
-        lastDate: Date.now() + 10 * 24 * 60 * 60 * 1000, // 10 days in milliseconds
-        claimed: false,
-      });
+        const user =await User.findById(userId);
+        const couponId = req.body.couponId;
+        user.availableCoupons.push({
+            couponId: couponId,
+            lastDate: Date.now() + 10 * 24 * 60 * 60 * 1000, // 10 days in milliseconds
+            claimed: false,
+        });
 
     await user.save();
     res.status(200).json(user.availableCoupons);

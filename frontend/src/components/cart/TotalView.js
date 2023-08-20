@@ -68,9 +68,6 @@ const TotalView = ({ page = "cart",setCouponId,couponId }) => {
 
     const getRewards = async () => {
         const {data }=await axios.get(`${BACKEND_URL}/coupons`);
-        console.log(data)
-        console.log(rewards);
-        console.log(user.availableCoupons);
         setRewards(data);
         let temp = data.filter(reward =>
           user.availableCoupons.some(tmp => tmp.couponId === reward._id && tmp.claimed===false)
@@ -82,7 +79,6 @@ const TotalView = ({ page = "cart",setCouponId,couponId }) => {
 
 
   const handleCouponChange = (event) => {
-    console.log("event hai", event.target.value);
     let tmpcoupon = availableRewards.find(tmp => tmp.title === event.target.value);
     // let tmpcoupon = event.target.value;
     if(tmpcoupon === undefined){
@@ -92,13 +88,8 @@ const TotalView = ({ page = "cart",setCouponId,couponId }) => {
     setCoupon(tmpcoupon.title);
     if(setCouponId)setCouponId(tmpcoupon._id);
 
-    // const parsedObject = event.target.value;
-    // setCoupon(prevCoupon => ({...prevCoupon,_id:parsedObject._id, }));
-    // console.log("coupon hai", coupon,{...parsedObject});
     let pr = 0;
     let discount_bubble = 0;
-    console.log("coupon hai", coupon);
-    console.log("price hai and discount hai abhi", pr, discount);
     cartItems.forEach(item => {
       pr += item.price.mrp * item.qty;
       discount_bubble += (item.price.mrp - item.price.cost) * item.qty;
@@ -107,7 +98,6 @@ const TotalView = ({ page = "cart",setCouponId,couponId }) => {
     if(tmpcoupon.delievery){
       setDeliveryCharges(0);
     } else{
-      console.log("milna chahiye", tmpcoupon.percentageoff*pr, tmpcoupon.maxoff);
       discount_bubble += tmpcoupon.percentageoff*pr>tmpcoupon.maxoff?tmpcoupon.maxoff:tmpcoupon.percentageoff*pr;
       setDeliveryCharges(pr - discount > 5000 ? 0 : 50);
     }
@@ -115,7 +105,6 @@ const TotalView = ({ page = "cart",setCouponId,couponId }) => {
     setPrice(pr);
     setDiscount(discount_bubble);
 
-    console.log("price hai and discount hai abhi4 ", pr, discount_bubble);
     if (page === "checkout") {
       dispatch(setTotalAmount(pr - discount_bubble + (pr - discount > 5000 ? 0 : 50)));
     }
@@ -135,7 +124,6 @@ const TotalView = ({ page = "cart",setCouponId,couponId }) => {
       setPrice(pr);
       setDiscount(disc);
       setDeliveryCharges(pr - disc > 5000 ? 0 : 50);
-      console.log("price hai and discount hai abhi2", pr, disc, (pr - disc > 5000 ? 0 : 50));
       if (page === "checkout") {
         dispatch(setTotalAmount(pr - disc + (pr - disc > 5000 ? 0 : 50)));
       }

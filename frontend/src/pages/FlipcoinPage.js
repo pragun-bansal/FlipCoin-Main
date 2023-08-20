@@ -34,7 +34,6 @@ const FlipcoinPage = () => {
       const signer = provider.getSigner();
       const tokenContract = new ethers.Contract(TOKEN_ADDRESS, Flcabi, sender);
       const walletAddress = await signer.getAddress();
-      await provider.send("eth_requestAccounts", []);
       const filter = tokenContract.filters.Transfer(walletAddress, null);
       const transferEventsSent = await tokenContract.queryFilter(filter);
       transferEventsSent.reverse();
