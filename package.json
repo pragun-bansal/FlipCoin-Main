@@ -6,10 +6,10 @@
   "repository": "https://github.com/dhavalCode/flipkart-clone",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "yarn install &&cd .. &&cd client && yarn install && yarn build",
-    "start": "node server.js"
+    "build": "npm install &&cd client && npm install && npm run build",
+    "start": "node index.js"
   },
-  "author": "Dhaval Patel",
+  "author": "Pragun Shivam Yash",
   "engines": {
     "node": "^16.13.2"
   },
